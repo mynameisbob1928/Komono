@@ -1,5 +1,5 @@
 import { Slash } from "../../../../bases/slash";
-import { i18n } from "../../../../utils/i18n";
+import { Locales } from "../../../../utils/locales";
 
 export default Slash.Create({
     body: {
@@ -15,6 +15,6 @@ export default Slash.Create({
     defer: true,
     async callback(interaction, args) {
         const l = interaction.locale;
-        await interaction.editReply(i18n.Translate("pong", l));
+        await interaction.editReply(Locales.Translate("pong", l));
     }
 });
