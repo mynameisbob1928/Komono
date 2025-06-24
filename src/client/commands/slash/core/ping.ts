@@ -1,4 +1,5 @@
 import { Slash } from "../../../../bases/slash";
+import { i18n } from "../../../../utils/i18n";
 
 export default Slash.Create({
     body: {
@@ -13,8 +14,7 @@ export default Slash.Create({
     },
     defer: true,
     async callback(interaction, args) {
-        await interaction.editReply({
-            content: interaction.client.ws.ping.toString()
-        });
+        const l = interaction.locale;
+        await interaction.editReply(i18n.Translate("pong", l));
     }
 });

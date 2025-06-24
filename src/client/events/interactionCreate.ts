@@ -60,23 +60,25 @@ export default Event.Create("interactionCreate", async function (interaction) {
             await slash.autocomplete(interaction);
             break;
         case InteractionType.MessageComponent:
+            const [name, ...args] = interaction.customId.split("_");
             if (interaction.isButton()) {
                 console.log(`Received button interaction: ${interaction.customId}`);
-                const button = Handler.Components.Find(interaction.customId);
+                const button = Handler.Components.Find(name);
                 if (!button) return;
-                await button.callback(interaction);
+                await button.callback(interaction, args);
             } else if (interaction.isAnySelectMenu()) {
                 console.log(`Received select menu interaction: ${interaction.customId}`);
-                const selectMenu = Handler.Components.Find(interaction.customId);
+                const selectMenu = Handler.Components.Find(name);
                 if (!selectMenu) return;
-                await selectMenu.callback(interaction, interaction.values);
+                await selectMenu.callback(interaction, args);
             };
             break;
         case InteractionType.ModalSubmit:
             console.log(`Received modal submit interaction: ${interaction.customId}`);
-            const modal = Handler.Components.Find(interaction.customId);
+            const [modalName, ...modalArgs] = interaction.customId.split("_");
+            const modal = Handler.Components.Find(modalName);
             if (!modal) return;
-            await modal.callback(interaction);
+            await modal.callback(interaction, modalArgs);
             break;
     };
 });

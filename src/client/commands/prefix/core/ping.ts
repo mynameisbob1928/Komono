@@ -5,9 +5,7 @@ export default Prefix.Create({
     description: "Check if the bot is alive",
     category: "Core",
     cooldown: 5000,
-    async callback(client, messagee, args) {
-        await messagee.reply({
-            content: client.ws.ping.toString()
-        });
+    async callback(client, message, args) {
+        await message.reply("Pong!")
     }
 });
