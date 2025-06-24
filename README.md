@@ -1,15 +1,9 @@
-# anya_degurechaff
+# Komono
 
-To install dependencies:
+your go-to companion for moderation, web requests, and code execution
 
-```bash
-bun install
-```
+[invite today](https://discord.com/oauth2/authorize?client_id=1240033877917962392)
 
-To run:
+## legal
 
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.7. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+Komono © 2024-2025 by the Komono Team is licensed under the GNU General Public License v3. See [LICENSE](LICENSE) for more details.
