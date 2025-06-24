@@ -9,8 +9,8 @@ import { Cooldown } from "../../utils/cooldown";
 export default Event.Create("interactionCreate", async function (interaction) {
     switch (interaction.type) {
         case InteractionType.ApplicationCommand:
-            console.log(`Received command interaction: ${interaction.commandName}`);
             if (!interaction.isChatInputCommand()) return;
+            console.log(`Received command interaction: ${interaction.commandName}`);
             const slash = Handler.Slashes.Find(interaction.commandName);
             if (!slash) return;
             if (interaction.inCachedGuild() && interaction.guild.members.me) {
