@@ -11,6 +11,18 @@ const client = new Client({
   ]
 });
 
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "Reason:", reason);
+});
+
+process.on("warning", (warning) => {
+  console.warn(`WARNING: ${warning.name} : ${warning.message}`);
+});
+
 const token = Env.Required("token").ToString();
 
 await Handler.Initialize({
