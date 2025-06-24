@@ -14,14 +14,12 @@ export namespace Locales {
 
         if (!fs.existsSync(filePath)) {
             console.error("Translation file not found:", filePath);
-            throw new Error('Translation file not found');
         };
 
         const language = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
         if (!language[key]) {
             console.error(`Missing key "${key}" in ${filePath}`);
-            throw new Error('Requested translation key is not found');
         };
 
         return Interpolate(language[key], params);
