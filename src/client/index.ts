@@ -28,7 +28,8 @@ const token = Env.Required("token").ToString();
 await Handler.Initialize({
   events: `${__dirname}/events`,
   slashes: `${__dirname}/commands/slash`,
-  prefixes: `${__dirname}/commands/prefix`
+  prefixes: `${__dirname}/commands/prefix`,
+  components: `${__dirname}/components`
 });
 
 Handler.Events.Bind(client);

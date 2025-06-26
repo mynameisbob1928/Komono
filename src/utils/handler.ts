@@ -45,17 +45,8 @@ export namespace Handler {
       delete require.cache[require.resolve(file)];
 
       promises.push(import(file).then(({ default: data }) => {
-        if (!data) {
-          throw new Error(`Failed to load data from file: ${file}`);
-        };
-
-        const key = data.name || data.body?.name || data.type || data.id
-        if (!key) {
-          throw new Error(`Data in file ${file} does not have a valid name or type.`);
-        };
-        
         data.path = file;
-        cache.set(key, data);
+        cache.set(data.name, data);
 
         return data;
       }));
@@ -79,7 +70,13 @@ export namespace Handler {
     export function Bind(client: Client) {
       Unbind(client);
 
-      Cache.events.forEach((event) => client.on(event.type, event.callback));
+      Cache.events.forEach((event) => {
+        if (event.once) {
+          client.once(event.type, event.callback);
+        } else {
+          client.on(event.type, event.callback);
+        };
+      });
     };
 
     export function Unbind(client: Client) {
@@ -87,7 +84,7 @@ export namespace Handler {
     };
 
     export async function Reload(client: Client, event: EventType) {
-      Cache.events.delete(event.type);
+      Cache.events.delete(event.name);
 
       client.off(event.type, event.callback);
 
