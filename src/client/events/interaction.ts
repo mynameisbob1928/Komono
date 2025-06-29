@@ -72,6 +72,7 @@ export default Event.Create({
                 break;
             case InteractionType.MessageComponent:
                 const [name, ...args] = interaction.customId.split("_");
+                if (!name || !args) return;
                 if (interaction.isButton()) {
                     console.log(`Received button interaction: ${interaction.customId}`);
                     const button = Handler.Components.Find(name);
@@ -87,6 +88,7 @@ export default Event.Create({
             case InteractionType.ModalSubmit:
                 console.log(`Received modal submit interaction: ${interaction.customId}`);
                 const [modalName, ...modalArgs] = interaction.customId.split("_");
+                if (!modalName || !modalArgs) return;
                 const modal = Handler.Components.Find(modalName);
                 if (!modal) return;
                 await modal.callback(interaction, modalArgs);

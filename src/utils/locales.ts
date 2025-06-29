@@ -7,7 +7,7 @@ export namespace Locales {
     const supportedLanguages = ["en", "pt", "fr"];
 
     export function Translate(key: string, lang: string, params: (string | number)[] = []): string {
-        const shortLang = lang.split('-')[0];
+        const shortLang = lang.split('-')[0] || fallback;
         const finalLang = supportedLanguages.includes(shortLang) ? shortLang : fallback;
 
         const filePath = `${path}/${finalLang}/${finalLang}.json`;

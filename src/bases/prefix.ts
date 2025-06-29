@@ -62,6 +62,7 @@ export namespace Prefix {
 
       for (let i = 0; i < args.length; i++) {
         const arg = args[i];
+        if (!arg) continue;
         let value = input.shift();
 
         if (arg.required && !value) {

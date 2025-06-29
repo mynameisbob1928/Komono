@@ -35,6 +35,9 @@ export namespace Request {
 
       let path = `/${splited.slice(1).join("/")}`;
 
+      if (!splited[0]) {
+        return reject("Invalid URL format");
+      };
       splited = splited[0].split(":");
 
       let [port, host] = splited.length > 1

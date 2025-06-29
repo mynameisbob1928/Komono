@@ -18,15 +18,21 @@ export namespace Markdown {
   };
 
   export function Icon(icon: string) {
-    return Emojis[icon].replace(/:[a-zA-Z0-9_]+:/, ':i:');
+    const emoji = Emojis[icon];
+    if (!emoji) throw new Error(`Emoji "${icon}" does not exist`);
+    return emoji.replace(/:[a-zA-Z0-9_]+:/, ':i:');
   };
 
   export function IconPill(icon: string, content: any) {
-    return `${Emojis[icon].replace(/:[a-zA-Z0-9_]+:/, ':i:')}  **\` ${content.toString().replace(/`/g, 'ˋ')} \`**`;
+    const emoji = Emojis[icon];
+    if (!emoji) throw new Error(`Emoji "${icon}" does not exist`);
+    return `${emoji.replace(/:[a-zA-Z0-9_]+:/, ':i:')}  **\` ${content.toString().replace(/`/g, 'ˋ')} \`**`;
   };
 
   export function SmallIconPill(icon: string, content: any) {
-    return `${Emojis[icon].replace(/:[a-zA-Z0-9_]+:/, ':i:')}  \` ${content.toString().replace(/`/g, 'ˋ')} \``;
+    const emoji = Emojis[icon];
+    if (!emoji) throw new Error(`Emoji "${icon}" does not exist`);
+    return `${emoji.replace(/:[a-zA-Z0-9_]+:/, ':i:')}  \` ${content.toString().replace(/`/g, 'ˋ')} \``;
   };
 
   export function Link(url: string, masked: string, tooltip: string = "", embed: boolean = false) {
@@ -44,7 +50,9 @@ export namespace Markdown {
 
   export function IconLinkPill(icon: string, url: string, content: any = "", tooltip = ""){
     if (tooltip.length) tooltip = ` '${tooltip}'`;
-    if (content) return `${Emojis[icon].replace(/:[a-zA-Z0-9_]+:/, ':i:')} [**\` ${content.toString().replace(/\`/g, 'ˋ')} \`**](${url.replace(/\)/g, '\\)')}${tooltip})`;
+    const emoji = Emojis[icon];
+    if (!emoji) throw new Error(`Emoji "${icon}" does not exist`);
+    if (content) return `${emoji.replace(/:[a-zA-Z0-9_]+:/, ':i:')} [**\` ${content.toString().replace(/\`/g, 'ˋ')} \`**](${url.replace(/\)/g, '\\)')}${tooltip})`;
     return url;
   };
 

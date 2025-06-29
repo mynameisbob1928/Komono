@@ -159,7 +159,9 @@ export namespace Slash {
       );
 
       for (const name in slash.body) {
-        AppendToSlash(builder, { name,...slash.body[name] });
+        const body = slash.body[name];
+        if (!body) continue;
+        AppendToSlash(builder, { name, ...body });
       };
 
       const subcmd = Object.values(slash.body).some(cmd => cmd.type === "command" || cmd.type === "group");
@@ -205,7 +207,9 @@ export namespace Slash {
     if(item.type == "command" || item.type == "group") {
       builder[item.type == "command" ? "addSubcommand" : "addSubcommandGroup"]((builder: any) => {
         for(const name in item.body) {
-          AppendToSlash(builder as any, { name, ...item.body[name] });
+          const body = item.body[name];
+          if(!body) continue;
+          AppendToSlash(builder as any, { name, ...body });
         };
 
         return builder.setName(item.name).setDescription(item.description);

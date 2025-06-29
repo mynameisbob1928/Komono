@@ -111,7 +111,10 @@ export namespace Handler {
     export async function Reload(client: Client, slash: SlashType) {
       Cache.slashes.delete(slash.body.name);
 
-      [slash] = await Load(slash.path, Cache.slashes) as SlashType[];
+      const loaded = await Load(slash.path, Cache.slashes) as SlashType[];
+      if (!loaded[0]) throw new Error("Failed to reload slash command");
+
+      slash = loaded[0];
 
       // @ts-ignore
       await Rest.put(Routes.applicationCommands(client.user.id), { body: Slash.ToJSON(slash.body) });

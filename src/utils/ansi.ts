@@ -29,7 +29,11 @@ export namespace Ansi {
         };
 
         if (!Colors[color]) {
-            color = Aliases[color];
+            const alias = Aliases[color];
+            if (!alias) {
+                throw new Error("Invalid ANSI Color");
+            };
+            color = alias;
         };
 
         return `${Ansi.Colors[color]}${text}${Ansi.Colors["reset"]}`;

@@ -86,9 +86,10 @@ export namespace Env {
     const content = fs.readFileSync(Path, "utf-8");
   
     content.split("\r\n").forEach((item) => {
-      const splited = (item.split(":") || [ ]);
-
-      Cache[splited[0]] = splited.slice(1).join(":");
+      const [key, ...rest] = item.split(":");
+      if (key) {
+        Cache[key] = rest.join(":");
+      };
     });
   };
 
