@@ -13,13 +13,13 @@ export namespace Locales {
         const filePath = `${path}/${finalLang}/${finalLang}.json`;
 
         if (!fs.existsSync(filePath)) {
-            console.error("Translation file not found:", filePath);
+            throw new Error(`Translation file not found in ${filePath}`);
         };
 
         const language = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
         if (!language[key]) {
-            console.error(`Missing key "${key}" in ${filePath}`);
+            throw new Error(`Missing key "${key}" in ${filePath}`);
         };
 
         return Interpolate(language[key], params);
