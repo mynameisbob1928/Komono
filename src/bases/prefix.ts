@@ -15,7 +15,7 @@ export namespace Prefix {
       client?: PermissionResolvable[];
       author?: PermissionResolvable[];
     };
-    args?: Prefix.Args.ArgsProps[];
+    args?: Args.ArgsProps[];
     
     callback(client: Client, message: Message, args: Record<string, any>): Promise<void>;
   };
@@ -52,15 +52,15 @@ export namespace Prefix {
       min?: number;
       max?: number;
       int?: boolean;
-      mention?: "User" | "Member";
-      channels?: ChannelType[];
+      mentionType?: "User" | "Member";
+      channelType?: ChannelType[];
     };
 
-    export async function Extract(client: Client, message: Message, args: ArgsProps[]): Promise<Record<string, any>> {
+    export async function Parse(client: Client, message: Message, args: ArgsProps[]): Promise<Record<string, any>> {
       const solved: Record<string, any> = {};
-      const input = message.content.match(/(?:[^\s"]+|"[^"]*")+/g)?.slice(1) || [];
+      const input = message.content.match(/(?:[^\s"']+|"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)')+/g)?.slice(1) || [];
 
-      for (let i = 0; i = args.length; i++) {
+      for (let i = 0; i < args.length; i++) {
         const arg = args[i];
         let value = input.shift();
 
@@ -73,61 +73,73 @@ export namespace Prefix {
           continue;
         };
 
-        const cleanValue = value.startsWith('"') && value.endsWith('"')
-          ? value.slice(1, -1)
-          : value;
+        if (arg.type === 'text' && i === args.length - 1) {
+          value = [value, ...input].join(' ');
+          input.length = 0;
+        };
+
+        function Clean(v: string) {
+          if (v.startsWith('"') && v.endsWith('"') || v.startsWith("'") && v.endsWith("'")) {
+            v = v.slice(1, -1);
+          };
+
+          v.replace(/\\(["'\\])/g, "$1");
+          return v;
+        };
+
+        const cleanValue = Clean(value);
 
         switch(arg.type) {
           case "text":
             if (arg.min && cleanValue.length < arg.min) {
               throw new Error(`Arg "${arg.name}" must have at least ${arg.min} characters.`);
-            }
+            };
             if (arg.max && cleanValue.length > arg.max) {
               throw new Error(`Arg "${arg.name}" must have at most ${arg.max} characters.`);
-            }
+            };
             solved[arg.name] = cleanValue;
             break;
           case "number":
             const numberValue = parseFloat(cleanValue);
             if (isNaN(numberValue)) {
               throw new Error(`Arg "${arg.name}" must be a number.`);
-            }
+            };
             if (arg.int && !Number.isInteger(numberValue)) {
               throw new Error(`Arg "${arg.name}" must be an integer.`);
-            }
+            };
             if (arg.min && numberValue < arg.min) {
               throw new Error(`Arg "${arg.name}" must be at least ${arg.min}.`);
-            }
+            };
             if (arg.max && numberValue > arg.max) {
               throw new Error(`Arg "${arg.name}" must be at most ${arg.max}.`);
-            }
+            };
             solved[arg.name] = numberValue;
             break;
           case "boolean":
             if (!["true", "false"].includes(cleanValue.toLowerCase())) {
               throw new Error(`Arg "${arg.name}" must be true or false.`);
-            }
+            };
             solved[arg.name] = cleanValue.toLowerCase() === "true";
             break;
           case "channel":
             const channel = message.guild?.channels.cache.get(cleanValue.replace(/[<#>]/g, ""));
             if (!channel || !(channel instanceof GuildChannel)) {
               throw new Error(`Invalid channel for arg "${arg.name}".`);
-            }
-            if (!arg.channels?.includes(channel.type)) {
+            };
+            if (!arg.channelType?.includes(channel.type)) {
               throw new Error(`Channel type "${channel.type}" is not allowed for arg "${arg.name}".`);
-            }
+            };
             solved[arg.name] = channel;
             break;
           case "user":
             const id = cleanValue.replace(/[<@!>]/g, "");
             if (/^\d{17,19}$/.test(id)) {
-              const found = await (arg.mention === "Member"
+              const found = await (arg.mentionType === "Member"
                 ? message.guild?.members.fetch(id).catch(() => null)
                 : client.users.fetch(id, { force: true }).catch(() => null));
               if (!found) {
-                throw new Error(`Invalid ${arg.mention === "Member" ? "member" : "user"} for arg "${arg.name}".`);
-              }
+                throw new Error(`Invalid ${arg.mentionType === "Member" ? "member" : "user"} for arg "${arg.name}".`);
+              };
               solved[arg.name] = found;
             } else {
               if (args[i + 1]) {
@@ -135,14 +147,14 @@ export namespace Prefix {
                 continue;
               } else {
                 solved[arg.name] = null;
-              }
-            }
+              };
+            };
             break;
           case "role":
             const role = message.guild?.roles.cache.get(cleanValue.replace(/[<@&>]/g, ""));
             if (!role || !(role instanceof Role)) {
               throw new Error(`Invalid role for arg "${arg.name}".`);
-            }
+            };
             solved[arg.name] = role;
             break;
         };

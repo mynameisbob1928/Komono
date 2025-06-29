@@ -101,13 +101,6 @@ export namespace Slash {
     };
   };
 
-  export type SlashProps = {
-    name: string;
-    description: string;
-  
-    body: SlashCommandBuilder;
-  };
-
   export type Callback<T extends SlashOptions> = {
     name: string;
     description: string;

@@ -88,7 +88,8 @@ export namespace Handler {
 
       client.off(event.type, event.callback);
 
-      return Load(event.path, Cache.events);
+      await Load(event.path, Cache.events);
+      return;
     };
   };
 
@@ -96,10 +97,14 @@ export namespace Handler {
     export const Rest = new REST().setToken(Env.Required("token").ToString());
 
     export async function Bind(client: Client) {
-      if (client.isReady()) return Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash.body)) });
+      if (client.isReady()) {
+        await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash.body)) });
+        return;
+      };
 
       client.once("ready", async (client) => {
-        return Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash.body)) });
+        await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash.body)) });
+        return;
       });
     };
 
@@ -109,7 +114,8 @@ export namespace Handler {
       [slash] = await Load(slash.path, Cache.slashes) as SlashType[];
 
       // @ts-ignore
-      return Rest.put(Routes.applicationCommands(client.user.id), { body: Slash.ToJSON(slash.body) })
+      await Rest.put(Routes.applicationCommands(client.user.id), { body: Slash.ToJSON(slash.body) });
+      return;
     };
     
     export function Find(name: string) {
@@ -121,7 +127,8 @@ export namespace Handler {
     export async function Reload(prefix: PrefixType) {
       Cache.prefixes.delete(prefix.name);
 
-      return Load(prefix.path, Cache.prefixes);
+      await Load(prefix.path, Cache.prefixes);
+      return;
     };
 
     export function Find(name: string) {
@@ -133,7 +140,8 @@ export namespace Handler {
     export async function Reload(component: ComponentType) {
       Cache.components.delete(component.id);
 
-      return Load(component.path, Cache.components);
+      await Load(component.path, Cache.components);
+      return;
     };
 
     export function Find(id: string) {

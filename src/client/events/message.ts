@@ -58,7 +58,7 @@ export default Event.Create({
 
         let args: Record<string, any>;
         try {
-            args = Prefix.Args.Extract(message.client, message, command.args);
+            args = await Prefix.Args.Parse(message.client, message, command.args);
         } catch (e) {
             await message.reply({
                 embeds: [Embed.Create({

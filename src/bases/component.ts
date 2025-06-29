@@ -2,24 +2,24 @@ import { ButtonInteraction, type AnySelectMenuInteraction, ModalSubmitInteractio
 
 export namespace Component {
   export enum ComponentTypes {
-    Button = "Button",
-    SelectMenu = "Menu",
-    Modal = "Modal"
+    Button = "button",
+    SelectMenu = "menu",
+    Modal = "modal"
   };
 
-  type Interaction<T extends ComponentTypes> = T extends "Button"
+  type Interaction<T extends ComponentTypes> = T extends "button"
   ? ButtonInteraction<CacheType>
-  : T extends "Menu"
+  : T extends "menu"
     ? AnySelectMenuInteraction<CacheType>
     : ModalSubmitInteraction<CacheType>;
 
-  export type ComponentProps<T extends ComponentTypes = ComponentTypes> = {
+  export type ComponentProps<T extends ComponentTypes> = {
     id: string;
     type: T;
     callback: (interaction: Interaction<T>, args?: string[]) => Promise<void>;
   };
 
-  export function Create<T extends ComponentTypes>(props: ComponentProps) {
+  export function Create<T extends ComponentTypes>(props: ComponentProps<T>) {
     return {
       id: props.id,
       type: props.type,

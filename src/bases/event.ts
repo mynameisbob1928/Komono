@@ -1,7 +1,7 @@
 import type { ClientEvents } from "discord.js";
 
 export namespace Event {
-  export type EventProps<T extends keyof ClientEvents = keyof ClientEvents> = {
+  export type EventProps<T extends keyof ClientEvents> = {
     name: string;
     type: T;
     once?: boolean;
