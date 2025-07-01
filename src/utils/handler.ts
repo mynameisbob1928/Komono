@@ -83,12 +83,25 @@ export namespace Handler {
       Cache.events.forEach((event) => client.off(event.type, event.callback));
     };
 
+    /*
     export async function Reload(client: Client, event: EventType) {
       Cache.events.delete(event.name);
 
       client.off(event.type, event.callback);
 
       await Load(event.path, Cache.events);
+      return;
+    };
+    */
+
+    export async function Reload(client: Client, path: string) {
+      Cache.events.clear();
+
+      Unbind(client);
+
+      await Load(path, Cache.events);
+
+      Bind(client);
       return;
     };
   };
@@ -108,6 +121,7 @@ export namespace Handler {
       });
     };
 
+    /*
     export async function Reload(client: Client, slash: SlashType) {
       Cache.slashes.delete(slash.body.name);
 
@@ -120,6 +134,17 @@ export namespace Handler {
       await Rest.put(Routes.applicationCommands(client.user.id), { body: Slash.ToJSON(slash.body) });
       return;
     };
+    */
+
+    export async function Reload(client: Client, path: string) {
+      Cache.slashes.clear();
+
+      await Load(path, Cache.slashes) as SlashType[];
+
+      // @ts-ignore
+      await Rest.put(Routes.applicationCommands(client.user.id), { body: Slash.ToJSON(slash.body) });
+      return;
+    };
     
     export function Find(name: string) {
       return Cache.slashes.find(slash => slash.body.name === name);
@@ -127,10 +152,19 @@ export namespace Handler {
   };
   
   export namespace Prefixes {
+    /*
     export async function Reload(prefix: PrefixType) {
       Cache.prefixes.delete(prefix.name);
 
       await Load(prefix.path, Cache.prefixes);
+      return;
+    };
+    */
+
+    export async function Reload(path: string) {
+      Cache.prefixes.clear();
+
+      await Load(path, Cache.prefixes);
       return;
     };
 
@@ -140,10 +174,19 @@ export namespace Handler {
   };
 
   export namespace Components {
+    /*
     export async function Reload(component: ComponentType) {
       Cache.components.delete(component.id);
 
       await Load(component.path, Cache.components);
+      return;
+    };
+    */
+
+    export async function Reload(path: string) {
+      Cache.components.clear();
+
+      await Load(path, Cache.components);
       return;
     };
 

@@ -22,7 +22,7 @@ export default Event.Create({
         const command = Handler.Prefixes.Find(name);
         if (!command) return;
 
-        if (command.dev && !dev.includes(message.author.id)) return;
+        if (command.dev === true && !dev.includes(message.author.id)) return;
 
         const permissions = command.permissions;
         if (permissions.client.length && !permissions.client.some(p => message.guild.members.me?.permissions.has(p))) {
@@ -74,7 +74,7 @@ export default Event.Create({
         } catch (e) {
             await message.reply({
                 embeds: [Embed.Error({
-                    description: `Something went wrong while attempting to run this command.\n> ${Markdown.Highlight((e as Error).message)}\n-# Contact support ${Markdown.Link("https://discord.gg/7b234YFhmn", "here")}`
+                    description: `Something went wrong while attempting to run this command.\n${Markdown.Codeblock("ansi", (e as Error).message)}\n-# Contact support ${Markdown.Link("https://discord.gg/7b234YFhmn", "here")}`
                 })]
             });
             return;

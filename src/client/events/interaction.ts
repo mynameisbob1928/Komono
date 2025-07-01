@@ -58,7 +58,7 @@ export default Event.Create({
                 } catch (e) {
                     await interaction.reply({
                         embeds: [Embed.Error({
-                            description: `Something went wrong while attempting to run this command.\n> ${Markdown.Highlight((e as Error).message)}\n-# Contact support ${Markdown.Link("https://discord.gg/7b234YFhmn", "here")}`
+                            description: `Something went wrong while attempting to run this command.\n${Markdown.Codeblock("ansi", (e as Error).message)}\n-# Contact support ${Markdown.Link("https://discord.gg/7b234YFhmn", "here")}`
                         })],
                         flags: MessageFlags.Ephemeral
                     });
