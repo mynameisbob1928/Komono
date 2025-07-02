@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { ActivityType, Client, GatewayIntentBits } from "discord.js";
 import { Env } from "../utils/env";
 import { Handler } from "../utils/handler";
 
@@ -10,7 +10,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent
   ],
   allowedMentions: { parse: [] },
-  presence: { status: "online", activities: [{ name: "Canary version of Komono." }] }
+  presence: { status: "online", activities: [{ name: "Canary version of Komono.", type: ActivityType.Custom }] }
 });
 
 process.on("uncaughtException", (error) => {
