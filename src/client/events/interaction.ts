@@ -14,12 +14,12 @@ export default Event.Create({
         switch (interaction.type) {
             case InteractionType.ApplicationCommand:
                 if (!interaction.isChatInputCommand()) return;
-                console.log(`Received command interaction: ${interaction.commandName}`);
                 const command = Handler.Slashes.Find(interaction.commandName);
                 if (!command) return;
+                console.log(`Received command interaction: ${command.name}`);
                 const dev = Env.Required("dev").ToArray();
                 if (interaction.inCachedGuild()) {
-                    const permissions = command.body.permissions;
+                    const permissions = command.permissions;
                     if (permissions?.client?.length && permissions.client.some(p => interaction.guild.members.me?.permissions.has(p))) {
                         await interaction.reply({
                             content: `I'm missing the following permissions: ${Markdown.Highlight(permissions.client.map(perm => perm).join(', '))}`,
@@ -34,7 +34,7 @@ export default Event.Create({
                         });
                         return;
                     };
-                    const data = Cooldown.Get(interaction.user.id, command.body.name);
+                    const data = Cooldown.Get(interaction.user.id, command.name);
                     if (data && !dev.includes(interaction.user.id)) {
                         const now = Date.now();
                         await interaction.reply({
@@ -43,7 +43,7 @@ export default Event.Create({
                         });
                         return;
                     };
-                    Cooldown.Set(interaction.user.id, command.body.name, command.body.cooldown);
+                    Cooldown.Set(interaction.user.id, command.name, command.cooldown);
                 };
                 const incognito = (interaction.options as CommandInteractionOptionResolver<CacheType>).getBoolean("incognito") ?? false;
                 if (command.defer) {
@@ -51,9 +51,9 @@ export default Event.Create({
                 };
                 try {
                     await command.callback(interaction, {
-                        name: command.body.name,
-                        description: command.body.description,
-                        body: Slash.GetSlashCommands(interaction.options.data as any, command.body.body)
+                        name: command.name,
+                        description: command.description,
+                        args: Slash.GetSlashCommands(interaction.options.data as any, command.args)
                     });
                 } catch (e) {
                     await interaction.reply({

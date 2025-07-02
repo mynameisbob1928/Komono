@@ -111,12 +111,12 @@ export namespace Handler {
 
     export async function Bind(client: Client) {
       if (client.isReady()) {
-        await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash.body)) });
+        await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash)) });
         return;
       };
 
       client.once("ready", async (client) => {
-        await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash.body)) });
+        await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash)) });
         return;
       });
     };
@@ -147,7 +147,7 @@ export namespace Handler {
     };
     
     export function Find(name: string) {
-      return Cache.slashes.find(slash => slash.body.name === name);
+      return Cache.slashes.find(slash => slash.name === name);
     };
   };
   

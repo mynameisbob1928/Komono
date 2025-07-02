@@ -21,26 +21,32 @@ export namespace Slash {
   export type SlashOptions = {
     name: string;
     type: SlashTypes;
+    integrations: IntegrationsTypes[];
+    contexts: ContextsTypes[];
     description: string;
     category: "Core" | "Dev" | "Info" | "Moderation" | "Utility"
     usage?: string;
     examples?: string[];
     cooldown?: number;
     nsfw?: boolean
-    integrations: IntegrationsTypes[];
-    contexts: ContextsTypes[];
     permissions?: {
       client?: PermissionResolvable[];
       author?: PermissionResolvable[];
     };
 
-    body: {
+    args?: {
       [key: string]: OptionHandler<keyof OptionDict>;
     };
+
+    defer?: boolean;
+    ephemeral?: boolean;
+
+    callback: (interaction: Interaction, args: Callback<SlashOptions>) => Promise<void>;
+    autocomplete?: (interaction: AutocompleteInteraction<CacheType>) => Promise<void>;
   };
 
   export type OptionDict = {
-    text: string;
+    string: string;
     number: number;
     boolean: boolean;
 
@@ -60,9 +66,9 @@ export namespace Slash {
     : T extends "channel" ? ChannelOption<T>
     : T extends "number" ? NumberOption<T>
     : T extends "attachment" ? AttachmentOption<T>
-    : Option<T>;
+    : StringOption<T>;
 
-  export type Option<T extends keyof OptionDict> = {
+  export type StringOption<T extends keyof OptionDict> = {
     type: T;
     required?: boolean;
     description: string;
@@ -105,9 +111,7 @@ export namespace Slash {
     name: string;
     description: string;
 
-    body: {
-      [K in keyof T["body"]]: CallbackHandler<T["body"][K]>
-    };
+   args: T["args"] extends Record<string, any> ? { [K in keyof T["args"]]: CallbackHandler<T["args"][K]> } : {};
   };
 
   export type CallbackHandler<T extends OptionHandler<keyof OptionDict>> = 
@@ -125,9 +129,25 @@ export namespace Slash {
 
   type Interaction = ChatInputCommandInteraction<CacheType> | MessageContextMenuCommandInteraction<CacheType> | UserContextMenuCommandInteraction<CacheType>;
   
-  export function Create<T extends SlashOptions>(options: { body: T, defer?: boolean, ephemeral?: boolean, callback: (interaction: Interaction, args: Callback<T>) => Promise<void>; autocomplete?: (interaction: AutocompleteInteraction<CacheType>) => Promise<void>; }) {
+  export function Create(options: SlashOptions) {
+    options.permissions = { ...(options.permissions || {}) };
+
     return {
-      body: options.body,
+      name: options.name,
+      type: options.type,
+      integrations: options.integrations,
+      contexts: options.contexts,
+      description: options.description,
+      category: options.category,
+      usage: options.usage,
+      examples: options.examples || [],
+      cooldown: options.cooldown,
+      nsfw: options.nsfw ?? false,
+      permissions: {
+        author: options.permissions.author || [],
+        client: options.permissions.client || []
+      },
+      args: options.args || {},
       defer: !(options.defer == undefined ? true : !options.defer),
       ephemeral: !!options.ephemeral,
       callback: options.callback,
@@ -158,13 +178,13 @@ export namespace Slash {
        .filter((context): context is InteractionContextType => context!== undefined)
       );
 
-      for (const name in slash.body) {
-        const body = slash.body[name];
+      for (const name in slash.args) {
+        const body = slash.args[name];
         if (!body) continue;
         AppendToSlash(builder, { name, ...body });
       };
 
-      const subcmd = Object.values(slash.body).some(cmd => cmd.type === "command" || cmd.type === "group");
+      const subcmd = Object.values(slash.args || {}).some(cmd => cmd.type === "command" || cmd.type === "group");
 
       if (!subcmd) {
         builder.addBooleanOption(option =>
@@ -223,39 +243,32 @@ export namespace Slash {
         builder.addChannelOption((option) => option.setName(item.name).setDescription(item.description).addChannelTypes(ChannelType[item.channelType] as any).setRequired(!!item.required))
         break;
       };
-      
       case "member": {
         builder.addUserOption((option) => option.setName(item.name).setDescription(item.description).setRequired(!!item.required))
         break;
       };
-
       case "number": {
         if(item.isInt) builder.addNumberOption((option) => option.setName(item.name).setDescription(item.description).setMaxValue(item.max ?? Infinity).setMinValue(item.min ?? -Infinity).setRequired(!!item.required));
         else builder.addNumberOption((option) => option.setName(item.name).setDescription(item.description).setMaxValue(item.max ?? Infinity).setMinValue(item.min ?? -Infinity).setRequired(!!item.required));
-
         break;
       };
-
       case "role": {
         builder.addRoleOption((option) => option.setName(item.name).setDescription(item.description).setRequired(!!item.required))
         break;
       };
-
-      case "text": {
+      case "string": {
         builder.addStringOption((option) => { option.setName(item.name).setDescription(item.description).setRequired(!!item.required).setAutocomplete(!!item.autocomplete); 
           if (item.choices && !item.autocomplete) {
             option.addChoices(item.choices);
-          }
+          };
           return option;
         });
         break;
-      }
-
+      };
       case "attachment": {
         builder.addAttachmentOption((option) => option.setName(item.name).setDescription(item.description).setRequired(!!item.required))
         break;
-      }
-
+      };
       case "user": {
         builder.addUserOption((option) => option.setName(item.name).setDescription(item.description).setRequired(!!item.required))
         break;
@@ -276,7 +289,7 @@ export namespace Slash {
           data[option.name] = !!option.value;
           break;
         };
-        case "text": {
+        case "string": {
           data[option.name] = option.value;
           break;
         };
@@ -304,7 +317,6 @@ export namespace Slash {
           data[option.name] = option.member;
           break;
         };
-        
         case "group":
         case "command": {
           data[option.name] = GetSlashCommands(option.options as any, item.body);

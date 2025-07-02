@@ -9,7 +9,7 @@ export default Prefix.Create({
     cooldown: 5000,
     dev: true,
     args: [
-        { name: "type", type: "text", description: "Type of the item to reload (event, slash, prefix, component)", required: true },
+        { name: "type", type: "string", description: "Type of the item to reload (event, slash, prefix, component)", required: true },
     ],
     async callback(client, message, args) {
         const type = args.type.toLowerCase();

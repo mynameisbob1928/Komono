@@ -22,6 +22,8 @@ export default Event.Create({
         const command = Handler.Prefixes.Find(name);
         if (!command) return;
 
+        console.log(`Received command interaction: ${command.name}`);
+
         if (command.dev === true && !dev.includes(message.author.id)) return;
 
         const permissions = command.permissions;

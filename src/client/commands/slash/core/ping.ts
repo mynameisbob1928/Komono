@@ -2,16 +2,12 @@ import { Slash } from "../../../../bases/slash";
 import { Locales } from "../../../../utils/locales";
 
 export default Slash.Create({
-    body: {
-        name: "ping",
-        description: "Check if the bot is alive",
-        category: "Core",
-        cooldown: 5000,
-        integrations: [Slash.IntegrationsTypes.Guild, Slash.IntegrationsTypes.User],
-        contexts: [Slash.ContextsTypes.Guild, Slash.ContextsTypes.DM, Slash.ContextsTypes.Bot],
-        type: Slash.SlashTypes.Command,
-        body: {}
-    },
+    name: "ping",
+    type: Slash.SlashTypes.Command,
+    integrations: [Slash.IntegrationsTypes.Guild, Slash.IntegrationsTypes.User],
+    contexts: [Slash.ContextsTypes.Bot, Slash.ContextsTypes.DM, Slash.ContextsTypes.Guild],
+    description: "Check if the bot is alive",
+    category: "Core",
     defer: true,
     async callback(interaction, args) {
         const l = interaction.locale;

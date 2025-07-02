@@ -8,7 +8,9 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent
-  ]
+  ],
+  allowedMentions: { parse: [] },
+  presence: { status: "online", activities: [{ name: "Canary version of Komono." }] }
 });
 
 process.on("uncaughtException", (error) => {

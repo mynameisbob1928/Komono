@@ -3,8 +3,8 @@ import { Client, GuildChannel, Message, Role, type ChannelType, type PermissionR
 export namespace Prefix {
   export type PrefixProps = {
     name: string;
-    description: string;
     aliases?: string[];
+    description: string;
     category: "Core" | "Dev" | "Info" | "Moderation" | "Utility";
     usage?: string;
     examples?: string[];
@@ -46,13 +46,13 @@ export namespace Prefix {
     export type ArgsProps = {
       name: string;
       description: string;
-      type: "text" | "number" | "boolean" | "channel" | "user" | "role";
+      type: "string" | "number" | "boolean" | "channel" | "user" | "role";
       required?: boolean;
       default?: any;
       min?: number;
       max?: number;
       int?: boolean;
-      mentionType?: "User" | "Member";
+      isMember?: boolean;
       channelType?: ChannelType[];
     };
 
@@ -74,7 +74,7 @@ export namespace Prefix {
           continue;
         };
 
-        if (arg.type === 'text' && i === args.length - 1) {
+        if (arg.type === 'string' && i === args.length - 1) {
           value = [value, ...input].join(' ');
           input.length = 0;
         };
@@ -91,7 +91,7 @@ export namespace Prefix {
         const cleanValue = Clean(value);
 
         switch(arg.type) {
-          case "text":
+          case "string":
             if (arg.min && cleanValue.length < arg.min) {
               throw new Error(`Arg "${arg.name}" must have at least ${arg.min} characters.`);
             };
@@ -135,11 +135,11 @@ export namespace Prefix {
           case "user":
             const id = cleanValue.replace(/[<@!>]/g, "");
             if (/^\d{17,19}$/.test(id)) {
-              const found = await (arg.mentionType === "Member"
+              const found = await (arg.isMember === true
                 ? message.guild?.members.fetch(id).catch(() => null)
                 : client.users.fetch(id, { force: true }).catch(() => null));
               if (!found) {
-                throw new Error(`Invalid ${arg.mentionType === "Member" ? "member" : "user"} for arg "${arg.name}".`);
+                throw new Error(`Invalid ${arg.isMember === true ? "member" : "user"} for arg "${arg.name}".`);
               };
               solved[arg.name] = found;
             } else {
