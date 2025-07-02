@@ -92,6 +92,10 @@ export default Event.Create({
                 const modal = Handler.Components.Find(modalName);
                 if (!modal) return;
                 await modal.callback(interaction, modalArgs);
+                break;
+            default:
+                console.error(`Received invalid interaction type.`);
+                return;
         };
     }
 });
