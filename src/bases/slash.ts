@@ -41,8 +41,8 @@ export namespace Slash {
     defer?: boolean;
     ephemeral?: boolean;
 
-    callback: (interaction: Interaction, args: Callback<SlashOptions>) => Promise<void>;
-    autocomplete?: (interaction: AutocompleteInteraction<CacheType>) => Promise<void>;
+    callback(interaction: Interaction, args: Callback<SlashOptions>): Promise<void>;
+    autocomplete?(interaction: AutocompleteInteraction<CacheType>): Promise<void>;
   };
 
   export type OptionDict = {

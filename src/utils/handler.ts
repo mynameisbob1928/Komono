@@ -99,7 +99,7 @@ export namespace Handler {
 
       Unbind(client);
 
-      await Load(path, Cache.events);
+      await Load(path, Cache.events) as EventType[];
 
       Bind(client);
       return;
@@ -164,7 +164,7 @@ export namespace Handler {
     export async function Reload(path: string) {
       Cache.prefixes.clear();
 
-      await Load(path, Cache.prefixes);
+      await Load(path, Cache.prefixes) as PrefixType[];
       return;
     };
 
@@ -186,7 +186,7 @@ export namespace Handler {
     export async function Reload(path: string) {
       Cache.components.clear();
 
-      await Load(path, Cache.components);
+      await Load(path, Cache.components) as ComponentType[];
       return;
     };
 

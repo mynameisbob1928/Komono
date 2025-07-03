@@ -16,7 +16,7 @@ export namespace Component {
   export type ComponentProps<T extends ComponentTypes> = {
     id: string;
     type: T;
-    callback: (interaction: Interaction<T>, args?: string[]) => Promise<void>;
+    callback(interaction: Interaction<T>, args?: string[]): Promise<void>;
   };
 
   export function Create<T extends ComponentTypes>(props: ComponentProps<T>) {
