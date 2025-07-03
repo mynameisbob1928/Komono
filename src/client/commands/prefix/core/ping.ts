@@ -6,6 +6,6 @@ export default Prefix.Create({
     category: "Core",
     cooldown: 3000,
     async callback(client, message, args) {
-        await message.reply("Pong!")
+        await message.reply("Pong!");
     }
 });

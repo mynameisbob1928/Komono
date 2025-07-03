@@ -1,8 +1,9 @@
-import { ActivityType, Client, GatewayIntentBits } from "discord.js";
+import { ActivityType, GatewayIntentBits } from "discord.js";
+import { ShardingClient } from "status-sharding";
 import { Env } from "utils/env";
 import { Handler } from "utils/handler";
 
-const client = new Client({
+const client = new ShardingClient({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
@@ -11,18 +12,6 @@ const client = new Client({
   ],
   allowedMentions: { parse: [] },
   presence: { status: "online", activities: [{ name: "Canary version of Komono.", type: ActivityType.Custom }] }
-});
-
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught Exception:", error);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "Reason:", reason);
-});
-
-process.on("warning", (warning) => {
-  console.warn(`WARNING: ${warning.name} : ${warning.message}`);
 });
 
 const token = Env.Required("token").ToString();
