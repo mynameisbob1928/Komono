@@ -1,4 +1,4 @@
-import { Prefix } from "../../../../bases/prefix";
+import { Prefix } from "bases/prefix";
 
 export default Prefix.Create({
     name: "ping",

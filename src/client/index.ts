@@ -1,6 +1,6 @@
 import { ActivityType, Client, GatewayIntentBits } from "discord.js";
-import { Env } from "../utils/env";
-import { Handler } from "../utils/handler";
+import { Env } from "utils/env";
+import { Handler } from "utils/handler";
 
 const client = new Client({
   intents: [

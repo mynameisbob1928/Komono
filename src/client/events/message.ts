@@ -1,11 +1,11 @@
-import { Embed } from "../../utils/embed";
-import { Event } from "../../bases/event";
-import { Handler } from "../../utils/handler";
-import { Cooldown } from "../../utils/cooldown";
-import { Prefix } from "../../bases/prefix";
-import { Markdown } from "../../utils/markdown";
-import { Env } from "../../utils/env";
 import { ChannelType } from "discord.js";
+import { Event } from "bases/event";
+import { Prefix } from "bases/prefix";
+import { Cooldown } from "utils/cooldown";
+import { Env } from "utils/env";
+import { Handler } from "utils/handler";
+import { Markdown } from "utils/markdown";
+import { Embed } from "utils/embed";
 
 export default Event.Create({
     name: "message",

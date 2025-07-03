@@ -1,10 +1,10 @@
-import fs from "fs";
 import { Collection, REST, Routes, type Client } from "discord.js";
+import fs from "fs";
+import { Event } from "bases/event";
+import { Slash } from "bases/slash";
+import { Prefix } from "bases/prefix";
+import { Component } from "bases/component";
 import { Env } from "./env";
-import { Slash } from "../bases/slash";
-import { Event } from "../bases/event";
-import { Prefix } from "../bases/prefix";
-import { Component } from "../bases/component";
 
 export namespace Handler {
   export type Paths = {

@@ -1,6 +1,5 @@
-import { Prefix } from "../../../../bases/prefix";
-import { Embed } from "../../../../utils/embed";
-import { Handler } from "../../../../utils/handler";
+import { Prefix } from "bases/prefix";
+import { Handler } from "utils/handler";
 
 export default Prefix.Create({
     name: "reload",

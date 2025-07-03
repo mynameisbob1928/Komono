@@ -1,4 +1,4 @@
-import { Event } from "../../bases/event";
+import { Event } from "bases/event";
 
 export default Event.Create({
   name: "ready",

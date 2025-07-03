@@ -1,11 +1,11 @@
 import { CommandInteractionOptionResolver, InteractionType, MessageFlags, type CacheType } from "discord.js";
-import { Event } from "../../bases/event";
-import { Handler } from "../../utils/handler";
-import { Slash } from "../../bases/slash";
-import { Embed } from "../../utils/embed";
-import { Markdown } from "../../utils/markdown";
-import { Cooldown } from "../../utils/cooldown";
-import { Env } from "../../utils/env";
+import { Event } from "bases/event";
+import { Slash } from "bases/slash";
+import { Cooldown } from "utils/cooldown";
+import { Env } from "utils/env";
+import { Handler } from "utils/handler";
+import { Markdown } from "utils/markdown";
+import { Embed } from "utils/embed";
 
 export default Event.Create({
     name: "interaction",

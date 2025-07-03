@@ -1,5 +1,5 @@
-import { Slash } from "../../../../bases/slash";
-import { Locales } from "../../../../utils/locales";
+import { Slash } from "bases/slash";
+import { Locales } from "utils/locales";
 
 export default Slash.Create({
     name: "ping",

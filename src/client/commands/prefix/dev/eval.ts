@@ -1,6 +1,6 @@
-import { Prefix } from "../../../../bases/prefix";
-import { Markdown } from "../../../../utils/markdown";
-import { Embed } from "../../../../utils/embed";
+import { Prefix } from "bases/prefix";
+import { Embed } from "utils/embed";
+import { Markdown } from "utils/markdown";
 
 export default Prefix.Create({
     name: "eval",
