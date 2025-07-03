@@ -7,8 +7,7 @@ const token = Env.Required("token").ToString();
 const manager = new ClusterManager(client, {
     mode: "process",
     token: token,
-    // shardsPerClusters: 4,
-    // Auto for now cause little bot
+    shardsPerClusters: 4,
     respawn: true,
     heartbeat: {
         enabled: true,
