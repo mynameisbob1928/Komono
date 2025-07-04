@@ -1,18 +1,18 @@
 import { ApplicationCommandType, ApplicationIntegrationType, Attachment, AutocompleteInteraction, ChannelType, ChatInputCommandInteraction, ContextMenuCommandBuilder, InteractionContextType, MessageContextMenuCommandInteraction, SlashCommandBuilder, UserContextMenuCommandInteraction, type CacheType, type Channel, type CommandInteractionOption, type GuildMember, type PermissionResolvable, type Role, type User } from "discord.js";
 
 export namespace Slash {
-  export enum SlashTypes {
+  export enum SlashType {
     Command = 'command',
     ContextUser = 'context_user',
     ContextMessage = 'context_message'
   };
 
-  export enum IntegrationsTypes {
+  export enum Integration {
     Guild = 'guild',
     User = 'user'
   };
 
-  export enum ContextsTypes {
+  export enum Context {
     Guild = 'guild',
     Bot = 'bot',
     DM = 'dm'
@@ -20,9 +20,9 @@ export namespace Slash {
 
   export type SlashOptions = {
     name: string;
-    type: SlashTypes;
-    integrations: IntegrationsTypes[];
-    contexts: ContextsTypes[];
+    type: SlashType;
+    integrations: Integration[];
+    contexts: Context[];
     description: string;
     category: "Core" | "Dev" | "Info" | "Moderation" | "Utility"
     usage?: string;
@@ -156,24 +156,24 @@ export namespace Slash {
   };
 
   export function ToJSON(slash: SlashOptions) {
-    if (slash.type === Slash.SlashTypes.Command) {
+    if (slash.type === Slash.SlashType.Command) {
       const builder = new SlashCommandBuilder()
       .setName(slash.name)
       .setDescription(slash.description)
       .setIntegrationTypes(
         slash.integrations
         .map(type => {
-          if (type === IntegrationsTypes.Guild) return ApplicationIntegrationType.GuildInstall;
-          if (type === IntegrationsTypes.User) return ApplicationIntegrationType.UserInstall
+          if (type === Integration.Guild) return ApplicationIntegrationType.GuildInstall;
+          if (type === Integration.User) return ApplicationIntegrationType.UserInstall
         })
         .filter((type): type is ApplicationIntegrationType => type!== undefined)
       )
       .setContexts(
         slash.contexts
        .map(context => {
-          if (context === ContextsTypes.Guild) return InteractionContextType.Guild;
-          if (context === ContextsTypes.DM) return InteractionContextType.PrivateChannel;
-          if (context === ContextsTypes.Bot) return InteractionContextType.BotDM
+          if (context === Context.Guild) return InteractionContextType.Guild;
+          if (context === Context.DM) return InteractionContextType.PrivateChannel;
+          if (context === Context.Bot) return InteractionContextType.BotDM
         })
        .filter((context): context is InteractionContextType => context!== undefined)
       );
@@ -194,27 +194,27 @@ export namespace Slash {
       }
 
       return builder.toJSON();
-    } else if (slash.type === Slash.SlashTypes.ContextUser || slash.type === Slash.SlashTypes.ContextMessage) {
+    } else if (slash.type === Slash.SlashType.ContextUser || slash.type === Slash.SlashType.ContextMessage) {
       const builder = new ContextMenuCommandBuilder()
       .setName(slash.name)
-      .setType(slash.type === Slash.SlashTypes.ContextUser
+      .setType(slash.type === Slash.SlashType.ContextUser
         ? ApplicationCommandType.User
         : ApplicationCommandType.Message
       )
       .setIntegrationTypes(
         slash.integrations
         .map(type => {
-          if (type === IntegrationsTypes.Guild) return ApplicationIntegrationType.GuildInstall;
-          if (type === IntegrationsTypes.User) return ApplicationIntegrationType.UserInstall
+          if (type === Integration.Guild) return ApplicationIntegrationType.GuildInstall;
+          if (type === Integration.User) return ApplicationIntegrationType.UserInstall
         })
         .filter((type): type is ApplicationIntegrationType => type!== undefined)
       )
       .setContexts(
         slash.contexts
        .map(context => {
-          if (context === ContextsTypes.Guild) return InteractionContextType.Guild;
-          if (context === ContextsTypes.DM) return InteractionContextType.PrivateChannel;
-          if (context === ContextsTypes.Bot) return InteractionContextType.BotDM
+          if (context === Context.Guild) return InteractionContextType.Guild;
+          if (context === Context.DM) return InteractionContextType.PrivateChannel;
+          if (context === Context.Bot) return InteractionContextType.BotDM
         })
        .filter((context): context is InteractionContextType => context!== undefined)
       );

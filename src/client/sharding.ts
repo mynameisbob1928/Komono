@@ -1,5 +1,6 @@
 import { ClusterManager } from 'status-sharding';
 import { Env } from 'utils/env';
+import { Log } from 'utils/log';
 
 const client = 'src/client/app.ts';
 const token = Env.Required("token").ToString();
@@ -21,20 +22,20 @@ const manager = new ClusterManager(client, {
 });
 
 process.on("uncaughtException", (error) => {
-  console.error("Uncaught Exception:", error);
+  Log.Write(`Uncaught Exception: ${error}`);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "Reason:", reason);
+  Log.Write(`Unhandled Rejection at: ${promise} Reason: ${reason}`);
 });
 
 process.on("warning", (warning) => {
-  console.warn(`WARNING: ${warning.name} : ${warning.message}`);
+  Log.Write(`WARNING: ${warning.name} : ${warning.message}`);
 });
 
 manager.on("clusterCreate", (cluster) => {
     cluster.on("death", (shard) => {
-        console.error(`Cluster ${shard.id} died.`)
+        Log.Write(`Cluster ${shard.id} died.`)
     });
 });
 

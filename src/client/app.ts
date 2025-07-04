@@ -2,6 +2,8 @@ import { ActivityType, GatewayIntentBits } from "discord.js";
 import { ShardingClient } from "status-sharding";
 import { Env } from "utils/env";
 import { Handler } from "utils/handler";
+import { Log } from "utils/log";
+import { Utils } from "utils/utils";
 
 const client = new ShardingClient({
   intents: [
@@ -15,6 +17,7 @@ const client = new ShardingClient({
 });
 
 const token = Env.Required("token").ToString();
+const now = Date.now();
 
 await Handler.Initialize({
   events: `${__dirname}/events`,
@@ -25,5 +28,9 @@ await Handler.Initialize({
 
 Handler.Events.Bind(client);
 await Handler.Slashes.Bind(client);
+
+client.once("ready", (client) => {
+  Log.Write(`${client.user?.username} is ready! Application startup took: ${Utils.Format(Date.now() - now)}.`)
+});
 
 await client.login(token);

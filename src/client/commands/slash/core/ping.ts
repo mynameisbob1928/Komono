@@ -3,9 +3,9 @@ import { Locales } from "utils/locales";
 
 export default Slash.Create({
     name: "ping",
-    type: Slash.SlashTypes.Command,
-    integrations: [Slash.IntegrationsTypes.Guild, Slash.IntegrationsTypes.User],
-    contexts: [Slash.ContextsTypes.Bot, Slash.ContextsTypes.DM, Slash.ContextsTypes.Guild],
+    type: Slash.SlashType.Command,
+    integrations: [Slash.Integration.Guild, Slash.Integration.User],
+    contexts: [Slash.Context.Bot, Slash.Context.DM, Slash.Context.Guild],
     description: "Check if the bot is alive",
     category: "Core",
     defer: true,

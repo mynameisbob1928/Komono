@@ -82,18 +82,7 @@ export namespace Handler {
     export function Unbind(client: Client) {
       Cache.events.forEach((event) => client.off(event.type, event.callback));
     };
-
-    /*
-    export async function Reload(client: Client, event: EventType) {
-      Cache.events.delete(event.name);
-
-      client.off(event.type, event.callback);
-
-      await Load(event.path, Cache.events);
-      return;
-    };
-    */
-
+    
     export async function Reload(client: Client, path: string) {
       Cache.events.clear();
 
@@ -121,21 +110,6 @@ export namespace Handler {
       });
     };
 
-    /*
-    export async function Reload(client: Client, slash: SlashType) {
-      Cache.slashes.delete(slash.body.name);
-
-      const loaded = await Load(slash.path, Cache.slashes) as SlashType[];
-      if (!loaded[0]) throw new Error("Failed to reload slash command");
-
-      slash = loaded[0];
-
-      // @ts-ignore
-      await Rest.put(Routes.applicationCommands(client.user.id), { body: Slash.ToJSON(slash.body) });
-      return;
-    };
-    */
-
     export async function Reload(client: Client, path: string) {
       Cache.slashes.clear();
 
@@ -152,15 +126,6 @@ export namespace Handler {
   };
   
   export namespace Prefixes {
-    /*
-    export async function Reload(prefix: PrefixType) {
-      Cache.prefixes.delete(prefix.name);
-
-      await Load(prefix.path, Cache.prefixes);
-      return;
-    };
-    */
-
     export async function Reload(path: string) {
       Cache.prefixes.clear();
 
@@ -174,15 +139,6 @@ export namespace Handler {
   };
 
   export namespace Components {
-    /*
-    export async function Reload(component: ComponentType) {
-      Cache.components.delete(component.id);
-
-      await Load(component.path, Cache.components);
-      return;
-    };
-    */
-
     export async function Reload(path: string) {
       Cache.components.clear();
 

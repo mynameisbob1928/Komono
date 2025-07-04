@@ -6,6 +6,7 @@ import { Env } from "utils/env";
 import { Handler } from "utils/handler";
 import { Markdown } from "utils/markdown";
 import { Embed } from "utils/embed";
+import { Log } from "utils/log";
 
 export default Event.Create({
     name: "interaction",
@@ -16,7 +17,7 @@ export default Event.Create({
                 if (!interaction.isChatInputCommand()) return;
                 const command = Handler.Slashes.Find(interaction.commandName);
                 if (!command) return;
-                console.log(`Received command interaction: ${command.name}`);
+                Log.Write(`Received command interaction: ${command.name}`);
                 const dev = Env.Required("dev").ToArray();
                 if (interaction.inCachedGuild()) {
                     const permissions = command.permissions;
@@ -56,6 +57,7 @@ export default Event.Create({
                         args: Slash.GetSlashCommands(interaction.options.data as any, command.args)
                     });
                 } catch (e) {
+                    Log.Write(e);
                     await interaction.reply({
                         embeds: [Embed.Error({
                             description: `Something went wrong while attempting to run this command.\n${Markdown.Codeblock("ansi", (e as Error).message)}\n-# Contact support ${Markdown.Link("https://discord.gg/7b234YFhmn", "here")}`
@@ -66,7 +68,7 @@ export default Event.Create({
                 };
                 break;
             case InteractionType.ApplicationCommandAutocomplete:
-                console.log(`Received autocomplete interaction: ${interaction.commandName}`);
+                Log.Write(`Received autocomplete interaction: ${interaction.commandName}`);
                 if (!command || !command.autocomplete || !interaction.isAutocomplete()) return;
                 await command.autocomplete(interaction);
                 break;
@@ -74,19 +76,19 @@ export default Event.Create({
                 const [name, ...args] = interaction.customId.split("_");
                 if (!name || !args) return;
                 if (interaction.isButton()) {
-                    console.log(`Received button interaction: ${interaction.customId}`);
+                    Log.Write(`Received button interaction: ${interaction.customId}`);
                     const button = Handler.Components.Find(name);
                     if (!button) return;
                     await button.callback(interaction, args);
                 } else if (interaction.isAnySelectMenu()) {
-                    console.log(`Received select menu interaction: ${interaction.customId}`);
+                    Log.Write(`Received select menu interaction: ${interaction.customId}`);
                     const menu = Handler.Components.Find(name);
                     if (!menu) return;
                     await menu.callback(interaction, args);
                 };
                 break;
             case InteractionType.ModalSubmit:
-                console.log(`Received modal submit interaction: ${interaction.customId}`);
+                Log.Write(`Received modal submit interaction: ${interaction.customId}`);
                 const [modalName, ...modalArgs] = interaction.customId.split("_");
                 if (!modalName || !modalArgs) return;
                 const modal = Handler.Components.Find(modalName);
@@ -94,7 +96,7 @@ export default Event.Create({
                 await modal.callback(interaction, modalArgs);
                 break;
             default:
-                console.error(`Received invalid interaction type.`);
+                Log.Write(`Received invalid interaction type.`);
                 return;
         };
     }

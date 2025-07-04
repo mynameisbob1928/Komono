@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "bun run src/client/sharding.ts"
+    "start": "bun --bun run src/client/sharding.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"
@@ -13,7 +13,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "discord.js": "^14.20.0",
+    "discord.js": "^14.21.0",
     "status-sharding": "^1.8.15"
   }
 }

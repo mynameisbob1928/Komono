@@ -6,6 +6,7 @@ import { Env } from "utils/env";
 import { Handler } from "utils/handler";
 import { Markdown } from "utils/markdown";
 import { Embed } from "utils/embed";
+import { Log } from "utils/log";
 
 export default Event.Create({
     name: "message",
@@ -22,7 +23,7 @@ export default Event.Create({
         const command = Handler.Prefixes.Find(name);
         if (!command) return;
 
-        console.log(`Received command interaction: ${command.name}`);
+        Log.Write(`Received command interaction: ${command.name}`);
 
         if (command.dev === true && !dev.includes(message.author.id)) return;
 
@@ -74,6 +75,7 @@ export default Event.Create({
         try {
             await command.callback(message.client, message, args);
         } catch (e) {
+            Log.Write(e);
             await message.reply({
                 embeds: [Embed.Error({
                     description: `Something went wrong while attempting to run this command.\n${Markdown.Codeblock("ansi", (e as Error).message)}\n-# Contact support ${Markdown.Link("https://discord.gg/7b234YFhmn", "here")}`

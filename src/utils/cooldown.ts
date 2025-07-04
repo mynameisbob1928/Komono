@@ -1,11 +1,7 @@
 import { Collection } from "discord.js";
 
 export namespace Cooldown {
-  export const DefaultCooldown = 1000;
-
-  export const MinuteTime = (60);
-  export const HourTime = (60 * 60);
-  export const DayTime = (HourTime * 24);
+  const Base = 1000;
 
   const Cache = new Collection<string, Collection<string, number>>();
 
@@ -23,7 +19,7 @@ export namespace Cooldown {
     return 0;
   };
 
-  export function Set(user: string, command: string, cooldown = DefaultCooldown) {
+  export function Set(user: string, command: string, cooldown = Base) {
     const userCooldowns = Cache.get(user) || new Collection<string, number>();
     
     userCooldowns.set(command, Date.now() + cooldown);
