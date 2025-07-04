@@ -17,7 +17,7 @@ export default Event.Create({
                 if (!interaction.isChatInputCommand()) return;
                 const command = Handler.Slashes.Find(interaction.commandName);
                 if (!command) return;
-                Log.Write(`Received command interaction: ${command.name}`);
+                Log.Write(`Received command interaction: ${command.name}`, "green");
                 const dev = Env.Required("dev").ToArray();
                 if (interaction.inCachedGuild()) {
                     const permissions = command.permissions;
@@ -57,7 +57,7 @@ export default Event.Create({
                         args: Slash.GetSlashCommands(interaction.options.data as any, command.args)
                     });
                 } catch (e) {
-                    Log.Write(e);
+                    Log.Write(e, "red");
                     await interaction.reply({
                         embeds: [Embed.Error({
                             description: `Something went wrong while attempting to run this command.\n${Markdown.Codeblock("ansi", (e as Error).message)}\n-# Contact support ${Markdown.Link("https://discord.gg/7b234YFhmn", "here")}`
@@ -68,35 +68,51 @@ export default Event.Create({
                 };
                 break;
             case InteractionType.ApplicationCommandAutocomplete:
-                Log.Write(`Received autocomplete interaction: ${interaction.commandName}`);
                 if (!command || !command.autocomplete || !interaction.isAutocomplete()) return;
-                await command.autocomplete(interaction);
+                Log.Write(`Received autocomplete interaction: ${command.name}`, "green");
+                try {
+                    await command.autocomplete(interaction);
+                } catch (e) {
+                    Log.Write(e, "red")
+                };
                 break;
             case InteractionType.MessageComponent:
                 const [name, ...args] = interaction.customId.split("_");
                 if (!name || !args) return;
                 if (interaction.isButton()) {
-                    Log.Write(`Received button interaction: ${interaction.customId}`);
+                    Log.Write(`Received button interaction: ${interaction.customId}`, "green");
                     const button = Handler.Components.Find(name);
                     if (!button) return;
-                    await button.callback(interaction, args);
+                    try {
+                        await button.callback(interaction, args);
+                    } catch (e) {
+                        Log.Write(e, "red");
+                    };
                 } else if (interaction.isAnySelectMenu()) {
-                    Log.Write(`Received select menu interaction: ${interaction.customId}`);
+                    Log.Write(`Received select menu interaction: ${interaction.customId}`, "green");
                     const menu = Handler.Components.Find(name);
                     if (!menu) return;
-                    await menu.callback(interaction, args);
+                    try {
+                        await menu.callback(interaction, args);
+                    } catch (e) {
+                        Log.Write(e, "red");
+                    };
                 };
                 break;
             case InteractionType.ModalSubmit:
-                Log.Write(`Received modal submit interaction: ${interaction.customId}`);
+                Log.Write(`Received modal submit interaction: ${interaction.customId}`, "green");
                 const [modalName, ...modalArgs] = interaction.customId.split("_");
                 if (!modalName || !modalArgs) return;
                 const modal = Handler.Components.Find(modalName);
                 if (!modal) return;
-                await modal.callback(interaction, modalArgs);
+                try {
+                    await modal.callback(interaction, modalArgs);
+                } catch (e) {
+                    Log.Write(e, "red");
+                };
                 break;
             default:
-                Log.Write(`Received invalid interaction type.`);
+                Log.Write(`Received invalid interaction type.`, "red");
                 return;
         };
     }

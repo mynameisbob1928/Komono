@@ -30,7 +30,7 @@ Handler.Events.Bind(client);
 await Handler.Slashes.Bind(client);
 
 client.once("ready", (client) => {
-  Log.Write(`${client.user?.username} is ready! Application startup took: ${Utils.Format(Date.now() - now)}.`)
+  Log.Write(`${client.user?.username} is ready! Application startup took: ${Utils.Format(Date.now() - now)}.`, "green")
 });
 
 await client.login(token);

@@ -23,7 +23,7 @@ export default Event.Create({
         const command = Handler.Prefixes.Find(name);
         if (!command) return;
 
-        Log.Write(`Received command interaction: ${command.name}`);
+        Log.Write(`Received command interaction: ${command.name}`, "green");
 
         if (command.dev === true && !dev.includes(message.author.id)) return;
 
@@ -75,7 +75,7 @@ export default Event.Create({
         try {
             await command.callback(message.client, message, args);
         } catch (e) {
-            Log.Write(e);
+            Log.Write(e, "red");
             await message.reply({
                 embeds: [Embed.Error({
                     description: `Something went wrong while attempting to run this command.\n${Markdown.Codeblock("ansi", (e as Error).message)}\n-# Contact support ${Markdown.Link("https://discord.gg/7b234YFhmn", "here")}`
