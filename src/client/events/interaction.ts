@@ -21,14 +21,14 @@ export default Event.Create({
                 const dev = Env.Required("dev").ToArray();
                 if (interaction.inCachedGuild()) {
                     const permissions = command.permissions;
-                    if (permissions?.client?.length && permissions.client.some(p => interaction.guild.members.me?.permissions.has(p))) {
+                    if (permissions?.client?.length && permissions.client.every(p => interaction.guild.members.me?.permissions.has(p))) {
                         await interaction.reply({
                             content: `I'm missing the following permissions: ${Markdown.Highlight(permissions.client.map(perm => perm).join(', '))}`,
                             flags: MessageFlags.Ephemeral
                         });
                         return;
                     };
-                    if (permissions?.author?.length && permissions.author.some(p => interaction.member.permissions.has(p))) {
+                    if (permissions?.author?.length && permissions.author.every(p => interaction.member.permissions.has(p))) {
                         await interaction.reply({
                             content: `You're missing the following permissions: ${Markdown.Highlight(permissions.author.map(perm => perm).join(', '))}`,
                             flags: MessageFlags.Ephemeral

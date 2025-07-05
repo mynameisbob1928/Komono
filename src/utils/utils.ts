@@ -1,3 +1,5 @@
+import { SnowflakeUtil, type Message } from "discord.js";
+
 export namespace Utils {
   export const ReadableFileSizeUnits = ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
@@ -36,5 +38,19 @@ export namespace Utils {
     if (milliseconds > 0 || (parts.length === 0 && Number(duration) < 1000)) parts.push(`${milliseconds}ms`);
 
     return parts.join(" ");
+  };
+
+  export async function Reference(message: Message) {
+    let last = message;
+    let after = SnowflakeUtil.generate({ timestamp: message.createdTimestamp -1 }).toString();
+
+    return (await message.channel.messages.fetch({ after })).reduce((list, current) => {
+      if (current.reference && current.reference.messageId == last.id && current.author.id == message.client.user.id) {
+        last = current;
+        list.push(current);
+      };
+
+      return list;
+    }, [] as Message[]);
   };
 };

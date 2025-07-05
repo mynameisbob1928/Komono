@@ -4,7 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "bun run src/client/sharding.ts"
+    "start": "bun run src/client/sharding.ts",
+    "database": "bunx prisma migrate dev --name init",
+    "generate": "bunx prisma generate --no-engine"
   },
   "devDependencies": {
     "@types/bun": "latest"
@@ -13,7 +15,10 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@prisma/client": "^6.11.1",
+    "@prisma/extension-accelerate": "^2.0.1",
     "discord.js": "^14.21.0",
+    "prisma": "^6.11.1",
     "status-sharding": "^1.8.15"
   }
 }

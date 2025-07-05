@@ -1,5 +1,5 @@
 import { Ansi } from "./ansi";
-import util from "util";
+import { inspect } from "util";
 
 export namespace Log {
     function Timestamp() {
@@ -14,21 +14,10 @@ export namespace Log {
     };
 
     export function Write(message: any, color?: string) {
-        let formatted: string;
+        const timestamp = Timestamp();
+        const formatted = typeof message === "string" ? message : inspect(message, { depth: 3, colors: false, breakLength: Infinity });
 
-        if (message instanceof Error) {
-            formatted = message.stack || message.message;
-        } else if (typeof message === "string") {
-            formatted = message
-        } else {
-            formatted = util.inspect(message, {
-                depth: null,
-                colors: false,
-                breakLength: Infinity
-            });
-        };
-
-        const output = `[${Timestamp()}] ${formatted}`;
+        const output = `[${timestamp}] ${formatted}`;
         process.stdout.write(color ? Ansi.Format(output, color) + '\n' : output + '\n');
     };
 };

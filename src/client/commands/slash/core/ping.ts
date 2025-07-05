@@ -1,3 +1,5 @@
+import { PrismaClient } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
 import { Slash } from "bases/slash";
 import { Locales } from "utils/locales";
 
@@ -10,7 +12,15 @@ export default Slash.Create({
     category: "Core",
     defer: true,
     async callback(interaction, args) {
+        const prisma = new PrismaClient().$extends(withAccelerate());
+        
+        const start = performance.now();
+        await prisma.dummy.count();
+        const end = performance.now();
+        const latency = Math.round((end - start));
+        await prisma.$disconnect();
+        
         const l = interaction.locale;
-        await interaction.editReply(Locales.Translate("pong", l));
+        await interaction.editReply(Locales.Translate("pong", l, [interaction.client.ws.ping, latency]));
     }
 });

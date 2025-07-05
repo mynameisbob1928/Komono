@@ -28,12 +28,12 @@ export default Event.Create({
         if (command.dev === true && !dev.includes(message.author.id)) return;
 
         const permissions = command.permissions;
-        if (permissions.client.length && !permissions.client.some(p => message.guild.members.me?.permissions.has(p))) {
+        if (permissions.client.length && !permissions.client.every(p => message.guild.members.me?.permissions.has(p))) {
             await message.reply(`I'm missing the following permissions: ${Markdown.Highlight(permissions.client.map(perm => perm).join(', '))}`);
             return;
         };
 
-        if (permissions.author.length && !permissions.author.some(p => message.member?.permissions.has(p))) {
+        if (permissions.author.length && !permissions.author.every(p => message.member?.permissions.has(p))) {
             await message.reply(`You're missing the following permissions: ${Markdown.Highlight(permissions.author.map(perm => perm).join(', '))}`);
             return;
         };
