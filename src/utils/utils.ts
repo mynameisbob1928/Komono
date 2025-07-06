@@ -1,4 +1,5 @@
 import { SnowflakeUtil, type Message } from "discord.js";
+import Prisma from "./database";
 
 export namespace Utils {
   export const ReadableFileSizeUnits = ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
@@ -52,5 +53,13 @@ export namespace Utils {
 
       return list;
     }, [] as Message[]);
+  };
+
+  export async function Prefix(guildId: string): Promise<string> {
+    const data = await Prisma.prefix.findUnique({
+      where: { guildId }
+    });
+       
+    return data?.prefix ?? "k.";
   };
 };

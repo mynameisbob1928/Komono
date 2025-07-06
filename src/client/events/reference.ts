@@ -7,7 +7,6 @@ export default Event.Create({
     type: "messageDelete",
     async callback(message) {
         try {
-            if (message.partial) await message.fetch();
             if (!message.inGuild() || message.author?.bot || !message.guild.members.me) return;
 
             const references = await Utils.Reference(message);

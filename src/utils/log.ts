@@ -17,7 +17,7 @@ export namespace Log {
         const timestamp = Timestamp();
         const formatted = typeof message === "string" ? message : inspect(message, { depth: 3, colors: false, breakLength: Infinity });
 
-        const output = `[${timestamp}] ${formatted}`;
+        const output = `${color ? Ansi.Format(`[${timestamp}]`, color) : `[${timestamp}]`} ${formatted}`;
         process.stdout.write(color ? Ansi.Format(output, color) + '\n' : output + '\n');
     };
 };

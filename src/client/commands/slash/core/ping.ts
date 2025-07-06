@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-import { withAccelerate } from "@prisma/extension-accelerate";
 import { Slash } from "bases/slash";
+import { Routes } from "discord.js";
+import Prisma from "utils/database";
 import { Locales } from "utils/locales";
 
 export default Slash.Create({
@@ -12,15 +12,17 @@ export default Slash.Create({
     category: "Core",
     defer: true,
     async callback(interaction, args) {
-        const prisma = new PrismaClient().$extends(withAccelerate());
-        
-        const start = performance.now();
-        await prisma.dummy.count();
-        const end = performance.now();
-        const latency = Math.round((end - start));
-        await prisma.$disconnect();
+        // REST
+        const restStart = performance.now();
+        await interaction.client.rest.get(Routes.user("@me"));
+        const restLatency = Math.round((performance.now() - restStart));
+
+        // Database      
+        const dbStart = performance.now();
+        await Prisma.dummy.count();
+        const dbLatency = Math.round((performance.now() - dbStart));
         
         const l = interaction.locale;
-        await interaction.editReply(Locales.Translate("pong", l, [interaction.client.ws.ping, latency]));
+        await interaction.editReply(Locales.Translate("pong", l, [(interaction.client.cluster.id ?? "N/A"), interaction.client.ws.ping, restLatency, dbLatency]));
     }
 });

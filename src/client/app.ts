@@ -4,6 +4,7 @@ import { Env } from "utils/env";
 import { Handler } from "utils/handler";
 import { Log } from "utils/log";
 import { Utils } from "utils/utils";
+import Prisma from "utils/database";
 
 const client = new ShardingClient({
   intents: [
@@ -12,7 +13,7 @@ const client = new ShardingClient({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent
   ],
-  partials: [Partials.Message, Partials.Channel],
+  partials: [Partials.Message],
   makeCache: Options.cacheWithLimits({
     ...Options.DefaultMakeCacheSettings,
     ApplicationCommandManager: 0,
@@ -52,8 +53,7 @@ const client = new ShardingClient({
     }
   },
   allowedMentions: { parse: [] },
-  presence: { status: "online", activities: [{ name: "Canary version of Komono.", type: ActivityType.Custom }] },
-  enforceNonce: true
+  presence: { status: "online", activities: [{ name: "Canary version of Komono.", type: ActivityType.Custom }] }
 });
 
 const token = Env.Required("token").ToString();
@@ -68,7 +68,17 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 
 process.on("warning", (warning) => {
-  Log.Write(`WARNING: ${warning.name} : ${warning.message}`, "red");
+  Log.Write(`WARNING: ${warning.name} : ${warning.message}`, "yellow");
+});
+
+process.on("SIGINT", async () => {
+  Log.Write("Shutting down Komono...", "cyan");
+  await client.destroy();
+
+  Log.Write("Shutting down Prisma client...", "cyan");
+  await Prisma.$disconnect();
+
+  process.exit(0);
 });
 
 await Handler.Initialize({
@@ -82,7 +92,7 @@ Handler.Events.Bind(client);
 await Handler.Slashes.Bind(client);
 
 client.once("ready", (client) => {
-  Log.Write(`${client.user?.username} is ready! Application startup took: ${Utils.Format(Date.now() - now)}.`, "yellow")
+  Log.Write(`${client.user!.username} is ready! Application startup took: ${Utils.Format(Date.now() - now)}.`, "cyan");
 });
 
 await client.login(token);

@@ -8,7 +8,7 @@ const token = Env.Required("token").ToString();
 const manager = new ClusterManager(client, {
     mode: "process",
     token: token,
-    shardsPerClusters: 4,
+    // shardsPerClusters: 4,
     respawn: true,
     heartbeat: {
         enabled: true,
@@ -34,9 +34,13 @@ process.on("warning", (warning) => {
 });
 
 manager.on("clusterCreate", (cluster) => {
-    cluster.on("death", (shard) => {
-        Log.Write(`Cluster ${shard.id} died.`, "red")
-    });
+  cluster.on("ready", () => {
+    Log.Write(`Cluster ${cluster.id} is ready!`, "green")
+  });
+
+  cluster.on("death", (cluster) => {
+    Log.Write(`Cluster ${cluster.id} died.`, "red")
+  });
 });
 
 await manager.spawn();

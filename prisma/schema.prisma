@@ -16,3 +16,8 @@ datasource db {
 model Dummy {
   id Int @id @default(autoincrement())
 }
+
+model Prefix {
+  guildId String @id
+  prefix String @default("k.")
+}

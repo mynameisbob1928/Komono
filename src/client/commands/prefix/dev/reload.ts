@@ -1,5 +1,5 @@
 import { Prefix } from "bases/prefix";
-import { Handler } from "utils/handler";
+import { Handler } from "utils/handler"
 
 export default Prefix.Create({
     name: "reload",
@@ -7,9 +7,7 @@ export default Prefix.Create({
     category: "Dev",
     cooldown: 5000,
     dev: true,
-    args: [
-        { name: "type", type: "string", description: "Type of the item to reload (event, slash, prefix, component)", required: true },
-    ],
+    args: [{ name: "type", type: "string", description: "Type of the item to reload (event, slash, prefix, component)", required: true }],
     async callback(client, message, args) {
         const type = args.type.toLowerCase();
         

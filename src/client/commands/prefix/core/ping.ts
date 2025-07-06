@@ -1,6 +1,6 @@
 import { Prefix } from "bases/prefix";
-import { PrismaClient } from "@prisma/client";
-import { withAccelerate } from "@prisma/extension-accelerate";
+import { Routes } from "discord.js";
+import Prisma from "utils/database";
 
 export default Prefix.Create({
     name: "ping",
@@ -8,14 +8,16 @@ export default Prefix.Create({
     category: "Core",
     cooldown: 3000,
     async callback(client, message, args) {
-        const prisma = new PrismaClient().$extends(withAccelerate());
-        
-        const start = performance.now();
-        await prisma.dummy.count();
-        const end = performance.now();
-        const latency = Math.round((end - start));
-        await prisma.$disconnect();
+        // REST
+        const restStart = performance.now();
+        await client.rest.get(Routes.user("@me"));
+        const restLatency = Math.round((performance.now() - restStart));
 
-        await message.reply(`Pong!\n-# Latency: ${client.ws.ping}ms | Database: ${latency}ms`);
+        // Database      
+        const dbStart = performance.now();
+        await Prisma.dummy.count();
+        const dbLatency = Math.round((performance.now() - dbStart));
+
+        await message.reply(`Pong!\n-# Gateway (Shard ${client.cluster.id ?? "N/A"}): **${client.ws.ping}ms** ・ REST: **${restLatency}ms** ・ Database: **${dbLatency}ms**`);
     }
 });
