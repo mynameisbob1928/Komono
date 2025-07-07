@@ -77,7 +77,7 @@ export default Event.Create({
                 };
                 break;
             case InteractionType.MessageComponent:
-                const [name, ...args] = interaction.customId.split("_");
+                const [name, ...args] = interaction.customId.split("-");
                 if (!name || !args) return;
                 if (interaction.isButton()) {
                     Log.Write(`Received button interaction: ${interaction.customId}`, "green");
@@ -101,7 +101,7 @@ export default Event.Create({
                 break;
             case InteractionType.ModalSubmit:
                 Log.Write(`Received modal submit interaction: ${interaction.customId}`, "green");
-                const [modalName, ...modalArgs] = interaction.customId.split("_");
+                const [modalName, ...modalArgs] = interaction.customId.split("-");
                 if (!modalName || !modalArgs) return;
                 const modal = Handler.Components.Find(modalName);
                 if (!modal) return;

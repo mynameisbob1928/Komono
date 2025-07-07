@@ -1,5 +1,6 @@
 import { Prefix } from "bases/prefix";
 import { Routes } from "discord.js";
+import { Button } from "utils/button";
 import Prisma from "utils/database";
 
 export default Prefix.Create({
@@ -18,6 +19,6 @@ export default Prefix.Create({
         await Prisma.dummy.count();
         const dbLatency = Math.round((performance.now() - dbStart));
 
-        await message.reply(`Pong!\n-# Gateway (Shard ${client.cluster.id ?? "N/A"}): **${client.ws.ping}ms** ・ REST: **${restLatency}ms** ・ Database: **${dbLatency}ms**`);
+        await message.reply({ content: `Pong!\n-# Gateway (Shard ${message.guild?.shardId ?? "N/A"}): **${client.ws.ping}ms** ・ REST: **${restLatency}ms** ・ Database: **${dbLatency}ms**` });
     }
 });

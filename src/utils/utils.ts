@@ -56,10 +56,12 @@ export namespace Utils {
   };
 
   export async function Prefix(guildId: string): Promise<string> {
-    const data = await Prisma.prefix.findUnique({
-      where: { guildId }
+    const data = await Prisma.prefix.upsert({
+      where: { guildId },
+      update: {},
+      create: { guildId }
     });
        
-    return data?.prefix ?? "k.";
+    return data.prefix;
   };
 };

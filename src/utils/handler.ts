@@ -134,7 +134,7 @@ export namespace Handler {
     };
 
     export function Find(name: string) {
-      return Cache.prefixes.find(prefix => prefix.name === name);
+      return Cache.prefixes.find(prefix => prefix.name === name || prefix.aliases.includes(name));
     };
   };
 

@@ -23,6 +23,6 @@ export default Slash.Create({
         const dbLatency = Math.round((performance.now() - dbStart));
         
         const l = interaction.locale;
-        await interaction.editReply(Locales.Translate("pong", l, [(interaction.client.cluster.id ?? "N/A"), interaction.client.ws.ping, restLatency, dbLatency]));
+        await interaction.editReply(Locales.Translate("pong", l, [(interaction.guild?.shardId ?? "N/A"), interaction.client.ws.ping, restLatency, dbLatency]));
     }
 });
