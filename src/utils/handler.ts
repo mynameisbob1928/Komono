@@ -85,9 +85,9 @@ export namespace Handler {
     };
     
     export async function Reload(client: Client, path: string) {
-      Cache.events.clear();
-
       Unbind(client);
+      
+      Cache.events.clear();
 
       await Load(path, Cache.events) as EventType[];
 
@@ -117,7 +117,7 @@ export namespace Handler {
       await Load(path, Cache.slashes) as SlashType[];
 
       // @ts-ignore
-      await Rest.put(Routes.applicationCommands(client.user.id), { body: Slash.ToJSON(slash.body) });
+      await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash)) });
       return;
     };
     

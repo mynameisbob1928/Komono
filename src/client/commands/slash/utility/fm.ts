@@ -2,8 +2,10 @@ import { Slash } from "bases/slash";
 import Prisma from "utils/database";
 import { Embed } from "utils/embed";
 import { Env } from "utils/env";
+import { Log } from "utils/log";
 import { Markdown } from "utils/markdown";
 import { Request } from "utils/request";
+import { Utils } from "utils/utils";
 
 export default Slash.Create({
     body: {
@@ -99,7 +101,7 @@ export default Slash.Create({
             embeds: [Embed.Create({
                 title: `${track.name} — ${track.artist["#text"]}`,
                 url: track.url,
-                description: `Album: ${track.album["#text"] || "**Album not found**"} ・ Scrobbles: **${Number(userInfo.user.userplaycount).toLocaleString("en-US") || "N/A"}**`,
+                description: `Album: ${track.album["#text"] ? `**${track.album["#text"]}**` : "**Album not found**"} ・ Scrobbles: **${Utils.Commas(userInfo.user.playcount) || "N/A"}**`,
                 thumb: track.image[2]["#text"]
             })]
         });

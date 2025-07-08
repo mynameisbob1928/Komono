@@ -64,4 +64,8 @@ export namespace Utils {
        
     return data.prefix;
   };
+
+  export function Commas(num: number | string) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
 };

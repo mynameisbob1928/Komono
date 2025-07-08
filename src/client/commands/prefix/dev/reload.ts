@@ -1,5 +1,6 @@
 import { Prefix } from "bases/prefix";
 import { Handler } from "utils/handler"
+import path from "path"
 
 export default Prefix.Create({
     name: "reload",
@@ -13,16 +14,16 @@ export default Prefix.Create({
         
         switch (type) {
             case "event":
-                await Handler.Events.Reload(client, `${__dirname}/../../../../events`);
+                await Handler.Events.Reload(client, path.join(__dirname, "../../../events"));
                 break;
             case "slash":
-                await Handler.Slashes.Reload(client, `${__dirname}/../../../slash`);
+                await Handler.Slashes.Reload(client, path.join(__dirname, "../../slash"));
                 break;
             case "prefix":
-                await Handler.Prefixes.Reload(`${__dirname}/..`);
+                await Handler.Prefixes.Reload(path.join(__dirname, ".."));
                 break;
             case "component":
-                await Handler.Components.Reload(`${__dirname}/../../../components`);
+                await Handler.Components.Reload(path.join(__dirname, "../../../components"));
                 break;
             default:
                 await message.reply("Invalid type! Use: event, slash, prefix, or component.");

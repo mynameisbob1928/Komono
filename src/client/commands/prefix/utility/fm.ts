@@ -4,6 +4,7 @@ import { Embed } from "utils/embed";
 import { Env } from "utils/env";
 import { Markdown } from "utils/markdown";
 import { Request } from "utils/request";
+import { Utils } from "utils/utils";
 
 export default Prefix.Create({
     name: "lastfm",
@@ -92,7 +93,7 @@ export default Prefix.Create({
             embeds: [Embed.Create({
                 title: `${track.name} — ${track.artist["#text"]}`,
                 url: track.url,
-                description: `Album: ${track.album["#text"] || "**Album not found**"} ・ Scrobbles: **${Number(userInfo.user.userplaycount).toLocaleString("en-US") || "N/A"}**`,
+                description: `Album: ${track.album["#text"] ? `**${track.album["#text"]}**` : "**Album not found**"} ・ Scrobbles: **${Utils.Commas(userInfo.user.playcount) || "N/A"}**`,
                 thumb: track.image[2]["#text"]
             })]
         });
