@@ -16,9 +16,7 @@ export default Slash.Create({
         description: "Show the music that you're listening to",
         category: "Utility",
         cooldown: 5000,
-        args: {
-            user: { type: "string", description: "Your lastfm username" }
-        }
+        args: { user: { type: "string", description: "Your lastfm username" } }
     },
     defer: true,
     async callback(interaction, args) {

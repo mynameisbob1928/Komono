@@ -12,7 +12,6 @@ export default Slash.Create({
         description: "Check if the bot is alive",
         category: "Core",
         cooldown: 3000,
-        args: {}
     },
     defer: true,
     async callback(interaction, args) {
