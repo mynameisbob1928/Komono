@@ -20,12 +20,14 @@ export namespace Handler {
   export type PrefixType = ReturnType<typeof Prefix["Create"]> & { path: string; };
   export type ComponentType = ReturnType<typeof Component["Create"]> & { path: string; };
 
+  /*
   export const Cache = {
     events: new Collection<string, EventType>(),
     slashes: new Collection<string, SlashType>(),
     prefixes: new Collection<string, PrefixType>(),
     components: new Collection<string, ComponentType>()
   };
+  */
 
   export function ReadDirRecursive(dir: string, callback: (filepath: string, filename: string) => any): any[] {
     return fs.readdirSync(dir).flatMap((filename) => {
@@ -56,13 +58,13 @@ export namespace Handler {
     return Promise.all(promises);
   };
 
-  export async function Initialize(paths: Paths) {
+  export async function Initialize(client: Client, paths: Paths) {
     const awaitList: (Promise<any>)[] = [];
 
-    if(paths.events) awaitList.push(Load(paths.events, Cache.events));
-    if(paths.slashes) awaitList.push(Load(paths.slashes, Cache.slashes));
-    if(paths.prefixes) awaitList.push(Load(paths.prefixes, Cache.prefixes));
-    if(paths.components) awaitList.push(Load(paths.components, Cache.components));
+    if(paths.events) awaitList.push(Load(paths.events, client.events));
+    if(paths.slashes) awaitList.push(Load(paths.slashes, client.slashes));
+    if(paths.prefixes) awaitList.push(Load(paths.prefixes, client.prefixes));
+    if(paths.components) awaitList.push(Load(paths.components, client.components));
 
     return Promise.all(awaitList);
   };
@@ -71,7 +73,7 @@ export namespace Handler {
     export function Bind(client: Client) {
       Unbind(client);
 
-      Cache.events.forEach((event) => {
+      client.events.forEach((event: EventType) => {
         if (event.once) {
           client.once(event.type, event.callback);
         } else {
@@ -81,15 +83,15 @@ export namespace Handler {
     };
 
     export function Unbind(client: Client) {
-      Cache.events.forEach((event) => client.off(event.type, event.callback));
+      client.events.forEach((event: EventType) => client.off(event.type, event.callback));
     };
     
     export async function Reload(client: Client, path: string) {
       Unbind(client);
       
-      Cache.events.clear();
+      client.events.clear();
 
-      await Load(path, Cache.events) as EventType[];
+      await Load(path, client.events) as EventType[];
 
       Bind(client);
       return;
@@ -101,54 +103,54 @@ export namespace Handler {
 
     export async function Bind(client: Client) {
       if (client.isReady()) {
-        await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash)) });
+        await Rest.put(Routes.applicationCommands(client.user.id), { body: client.slashes.map((slash: SlashType) => Slash.ToJSON(slash)) });
         return;
       };
 
       client.once("ready", async (client) => {
-        await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash)) });
+        await Rest.put(Routes.applicationCommands(client.user.id), { body: client.slashes.map((slash: SlashType) => Slash.ToJSON(slash)) });
         return;
       });
     };
 
     export async function Reload(client: Client, path: string) {
-      Cache.slashes.clear();
+      client.slashes.clear();
 
-      await Load(path, Cache.slashes) as SlashType[];
+      await Load(path, client.slashes) as SlashType[];
 
       // @ts-ignore
       await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash)) });
       return;
     };
     
-    export function Find(name: string) {
-      return Cache.slashes.find(slash => slash.name === name);
+    export function Find(client: Client, name: string) {
+      return client.slashes.find((slash: SlashType) => slash.name === name);
     };
   };
   
   export namespace Prefixes {
-    export async function Reload(path: string) {
-      Cache.prefixes.clear();
+    export async function Reload(client: Client, path: string) {
+      client.prefixes.clear();
 
-      await Load(path, Cache.prefixes) as PrefixType[];
+      await Load(path, client.prefixes) as PrefixType[];
       return;
     };
 
-    export function Find(name: string) {
-      return Cache.prefixes.find(prefix => prefix.name === name || prefix.aliases.includes(name));
+    export function Find(client: Client, name: string) {
+      return client.prefixes.find((prefix: PrefixType) => prefix.name === name || prefix.aliases.includes(name));
     };
   };
 
   export namespace Components {
-    export async function Reload(path: string) {
-      Cache.components.clear();
+    export async function Reload(client: Client, path: string) {
+      client.components.clear();
 
-      await Load(path, Cache.components) as ComponentType[];
+      await Load(path, client.components) as ComponentType[];
       return;
     };
 
-    export function Find(id: string) {
-      return Cache.components.find(component => component.id === id);
+    export function Find(client: Client, id: string) {
+      return client.components.find((component: ComponentType) => component.id === id);
     };
   }
 };

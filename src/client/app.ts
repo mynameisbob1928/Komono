@@ -1,4 +1,4 @@
-import { ActivityType, GatewayIntentBits, Options, Partials, Sweepers } from "discord.js";
+import { ActivityType, Collection, GatewayIntentBits, Options, Partials, Sweepers } from "discord.js";
 import { ShardingClient } from "status-sharding";
 import { Env } from "utils/env";
 import { Handler } from "utils/handler";
@@ -6,7 +6,15 @@ import { Log } from "utils/log";
 import { Utils } from "utils/utils";
 import Prisma from "utils/database";
 
-const client = new ShardingClient({
+class Client extends ShardingClient {
+  public events = new Collection<string, Handler.EventType>();
+  public slashes = new Collection<string, Handler.SlashType>();
+  public prefixes = new Collection<string, Handler.PrefixType>();
+  public components = new Collection<string, Handler.ComponentType>();
+  public prefix = "k."
+};
+
+const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
@@ -81,7 +89,7 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-await Handler.Initialize({
+await Handler.Initialize(client, {
   events: `${__dirname}/events`,
   slashes: `${__dirname}/commands/slash`,
   prefixes: `${__dirname}/commands/prefix`,

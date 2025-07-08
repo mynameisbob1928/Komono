@@ -14,7 +14,7 @@ export default Event.Create({
                 if (!guildId || !channelId || !messageId) return;
 
                 const channel = message.client.channels.cache.get(channelId) || await message.client.channels.fetch(channelId).catch(() => null);
-                if (!channel || !channel?.isTextBased()) return;
+                if (!channel || !channel.isSendable()) return;
 
                 const linkedMessage = channel.messages.cache.get(messageId) || await channel.messages.fetch(messageId).catch(() => null);
                 if (!linkedMessage) return;

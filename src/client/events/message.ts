@@ -1,4 +1,4 @@
-import { ChannelType } from "discord.js";
+import { ChannelType, type PermissionResolvable } from "discord.js";
 import { Event } from "bases/event";
 import { Prefix } from "bases/prefix";
 import { Cooldown } from "utils/cooldown";
@@ -14,13 +14,13 @@ export default Event.Create({
     async callback(message) {
         if (!message.inGuild() || !message.guild.members.me || !message.channel.permissionsFor(message.guild.members.me).has("SendMessages") || message.guild.members.me.isCommunicationDisabled() || message.author.bot) return;
 
-        const prefix = "k.";
+        const prefix = message.client.prefix;
         const dev = Env.Required("dev").ToArray();
 
         const name = message.content.slice(prefix.length).trim().split(/\s+/).shift()?.toLowerCase();
         if (!name) return;
 
-        const command = Handler.Prefixes.Find(name);
+        const command = Handler.Prefixes.Find(message.client, name);
         if (!command) return;
 
         Log.Write(`Received command interaction: ${command.name}`, "green");
@@ -28,13 +28,13 @@ export default Event.Create({
         if (command.dev === true && !dev.includes(message.author.id)) return;
 
         const permissions = command.permissions;
-        if (permissions.client.length && !permissions.client.every(p => message.guild.members.me?.permissions.has(p))) {
-            await message.reply(`I'm missing the following permissions: ${Markdown.Highlight(permissions.client.map(perm => perm).join(', '))}`);
+        if (permissions.client.length && !permissions.client.every((p: PermissionResolvable) => message.guild.members.me?.permissions.has(p))) {
+            await message.reply(`I'm missing the following permissions: ${Markdown.Highlight(permissions.client.map((perm: PermissionResolvable) => perm).join(', '))}`);
             return;
         };
 
-        if (permissions.author.length && !permissions.author.every(p => message.member?.permissions.has(p))) {
-            await message.reply(`You're missing the following permissions: ${Markdown.Highlight(permissions.author.map(perm => perm).join(', '))}`);
+        if (permissions.author.length && !permissions.author.every((p: PermissionResolvable) => message.member?.permissions.has(p))) {
+            await message.reply(`You're missing the following permissions: ${Markdown.Highlight(permissions.author.map((perm: PermissionResolvable) => perm).join(', '))}`);
             return;
         };
 

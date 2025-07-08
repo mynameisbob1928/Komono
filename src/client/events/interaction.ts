@@ -1,4 +1,4 @@
-import { CommandInteractionOptionResolver, InteractionType, MessageFlags, type CacheType } from "discord.js";
+import { CommandInteractionOptionResolver, InteractionType, MessageFlags, type CacheType, type PermissionResolvable } from "discord.js";
 import { Event } from "bases/event";
 import { Slash } from "bases/slash";
 import { Cooldown } from "utils/cooldown";
@@ -15,22 +15,22 @@ export default Event.Create({
         switch (interaction.type) {
             case InteractionType.ApplicationCommand:
                 if (!interaction.isChatInputCommand()) return;
-                const command = Handler.Slashes.Find(interaction.commandName);
+                const command = Handler.Slashes.Find(interaction.client, interaction.commandName);
                 if (!command) return;
                 Log.Write(`Received command interaction: ${command.name}`, "green");
                 const dev = Env.Required("dev").ToArray();
                 if (interaction.inCachedGuild()) {
                     const permissions = command.permissions;
-                    if (permissions?.client?.length && permissions.client.every(p => interaction.guild.members.me?.permissions.has(p))) {
+                    if (permissions?.client?.length && permissions.client.every((p: PermissionResolvable) => interaction.guild.members.me?.permissions.has(p))) {
                         await interaction.reply({
-                            content: `I'm missing the following permissions: ${Markdown.Highlight(permissions.client.map(perm => perm).join(', '))}`,
+                            content: `I'm missing the following permissions: ${Markdown.Highlight(permissions.client.map((perm: PermissionResolvable) => perm).join(', '))}`,
                             flags: MessageFlags.Ephemeral
                         });
                         return;
                     };
-                    if (permissions?.author?.length && permissions.author.every(p => interaction.member.permissions.has(p))) {
+                    if (permissions?.author?.length && permissions.author.every((p: PermissionResolvable) => interaction.member.permissions.has(p))) {
                         await interaction.reply({
-                            content: `You're missing the following permissions: ${Markdown.Highlight(permissions.author.map(perm => perm).join(', '))}`,
+                            content: `You're missing the following permissions: ${Markdown.Highlight(permissions.author.map((perm: PermissionResolvable) => perm).join(', '))}`,
                             flags: MessageFlags.Ephemeral
                         });
                         return;
@@ -81,7 +81,7 @@ export default Event.Create({
                 if (!name || !args) return;
                 if (interaction.isButton()) {
                     Log.Write(`Received button interaction: ${interaction.customId}`, "green");
-                    const button = Handler.Components.Find(name);
+                    const button = Handler.Components.Find(interaction.client, name);
                     if (!button) return;
                     try {
                         await button.callback(interaction, args);
@@ -90,7 +90,7 @@ export default Event.Create({
                     };
                 } else if (interaction.isAnySelectMenu()) {
                     Log.Write(`Received select menu interaction: ${interaction.customId}`, "green");
-                    const menu = Handler.Components.Find(name);
+                    const menu = Handler.Components.Find(interaction.client, name);
                     if (!menu) return;
                     try {
                         await menu.callback(interaction, args);
@@ -103,7 +103,7 @@ export default Event.Create({
                 Log.Write(`Received modal submit interaction: ${interaction.customId}`, "green");
                 const [modalName, ...modalArgs] = interaction.customId.split("-");
                 if (!modalName || !modalArgs) return;
-                const modal = Handler.Components.Find(modalName);
+                const modal = Handler.Components.Find(interaction.client, modalName);
                 if (!modal) return;
                 try {
                     await modal.callback(interaction, modalArgs);
