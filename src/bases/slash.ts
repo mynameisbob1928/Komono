@@ -20,9 +20,9 @@ export namespace Slash {
 
   export type SlashOptions = {
     name: string;
-    type: SlashType;
-    integrations: Integration[];
-    contexts: Context[];
+    type: keyof typeof SlashType;
+    integrations: (keyof typeof Integration)[];
+    contexts: (keyof typeof Context)[];
     description: string;
     category: "Core" | "Dev" | "Info" | "Moderation" | "Utility"
     usage?: string;
@@ -37,12 +37,6 @@ export namespace Slash {
     args?: {
       [key: string]: OptionHandler<keyof OptionDict>;
     };
-
-    defer?: boolean;
-    ephemeral?: boolean;
-
-    callback(interaction: Interaction, args: Callback<SlashOptions>): Promise<void>;
-    autocomplete?(interaction: AutocompleteInteraction<CacheType>): Promise<void>;
   };
 
   export type OptionDict = {
@@ -65,7 +59,6 @@ export namespace Slash {
     : T extends "command" ? CommandOrGroupOption<T>
     : T extends "channel" ? ChannelOption<T>
     : T extends "number" ? NumberOption<T>
-    : T extends "attachment" ? AttachmentOption<T>
     : StringOption<T>;
 
   export type StringOption<T extends keyof OptionDict> = {
@@ -74,12 +67,6 @@ export namespace Slash {
     description: string;
     choices?: Array<{ name: any; value: any }>;
     autocomplete?: boolean;
-  };
-
-  export type AttachmentOption<T extends keyof OptionDict> = {
-    type: T;
-    required?: boolean
-    description: string
   };
 
   export type NumberOption<T extends keyof OptionDict> = {
@@ -102,7 +89,7 @@ export namespace Slash {
     type: T;
     description: string;
 
-    body: {
+    args: {
       [key: string]: OptionHandler<keyof Omit<OptionDict, "command" | "group">>
     };
   };
@@ -111,17 +98,17 @@ export namespace Slash {
     name: string;
     description: string;
 
-   args: T["args"] extends Record<string, any> ? { [K in keyof T["args"]]: CallbackHandler<T["args"][K]> } : {};
+    body: T["args"] extends Record<string, OptionHandler<keyof OptionDict>> ? { [K in keyof T["args"]]: CallbackHandler<T["args"][K]> } : {};
   };
 
   export type CallbackHandler<T extends OptionHandler<keyof OptionDict>> = 
     T["type"] extends "command" ?
     // @ts-ignore
-    { [K in keyof T["body"]]: CallbackHandler<T["body"][K]>; }
+    { [K in keyof T["args"]]: CallbackHandler<T["args"][K]>; }
     // @ts-ignore
     : T["type"] extends "group" ?
     // @ts-ignore
-    { [K in keyof T["body"]]: CallbackHandler<T["body"][K]> }
+    { [K in keyof T["args"]]: CallbackHandler<T["args"][K]> }
     // @ts-ignore
     : T["required"] extends true
     ? OptionDict[T["type"]]
@@ -129,25 +116,11 @@ export namespace Slash {
 
   type Interaction = ChatInputCommandInteraction<CacheType> | MessageContextMenuCommandInteraction<CacheType> | UserContextMenuCommandInteraction<CacheType>;
   
-  export function Create(options: SlashOptions) {
-    options.permissions = { ...(options.permissions || {}) };
+  export function Create<T extends SlashOptions>(options: { body: T, defer?: boolean, ephemeral?: boolean, callback: (interaction: Interaction, args: Callback<T>) => Promise<void>; autocomplete?: (interaction: AutocompleteInteraction<CacheType>) => Promise<void> }) {
+    options.body.permissions = { ...(options.body.permissions || {}) };
 
     return {
-      name: options.name,
-      type: options.type,
-      integrations: options.integrations,
-      contexts: options.contexts,
-      description: options.description,
-      category: options.category,
-      usage: options.usage,
-      examples: options.examples || [],
-      cooldown: options.cooldown,
-      nsfw: options.nsfw ?? false,
-      permissions: {
-        author: options.permissions.author || [],
-        client: options.permissions.client || []
-      },
-      args: options.args || {},
+      ...options.body,
       defer: !(options.defer == undefined ? true : !options.defer),
       ephemeral: !!options.ephemeral,
       callback: options.callback,
@@ -156,24 +129,24 @@ export namespace Slash {
   };
 
   export function ToJSON(slash: SlashOptions) {
-    if (slash.type === Slash.SlashType.Command) {
+    if (slash.type === "Command") {
       const builder = new SlashCommandBuilder()
       .setName(slash.name)
       .setDescription(slash.description)
       .setIntegrationTypes(
         slash.integrations
         .map(type => {
-          if (type === Integration.Guild) return ApplicationIntegrationType.GuildInstall;
-          if (type === Integration.User) return ApplicationIntegrationType.UserInstall
+          if (type === "Guild") return ApplicationIntegrationType.GuildInstall;
+          if (type === "User") return ApplicationIntegrationType.UserInstall
         })
         .filter((type): type is ApplicationIntegrationType => type!== undefined)
       )
       .setContexts(
         slash.contexts
        .map(context => {
-          if (context === Context.Guild) return InteractionContextType.Guild;
-          if (context === Context.DM) return InteractionContextType.PrivateChannel;
-          if (context === Context.Bot) return InteractionContextType.BotDM
+          if (context === "Guild") return InteractionContextType.Guild;
+          if (context === "DM") return InteractionContextType.PrivateChannel;
+          if (context === "Bot") return InteractionContextType.BotDM
         })
        .filter((context): context is InteractionContextType => context!== undefined)
       );
@@ -194,27 +167,24 @@ export namespace Slash {
       }
 
       return builder.toJSON();
-    } else if (slash.type === Slash.SlashType.ContextUser || slash.type === Slash.SlashType.ContextMessage) {
+    } else if (slash.type === "ContextUser" || slash.type === "ContextMessage") {
       const builder = new ContextMenuCommandBuilder()
       .setName(slash.name)
-      .setType(slash.type === Slash.SlashType.ContextUser
-        ? ApplicationCommandType.User
-        : ApplicationCommandType.Message
-      )
+      .setType(slash.type === "ContextUser" ? ApplicationCommandType.User : ApplicationCommandType.Message)
       .setIntegrationTypes(
         slash.integrations
         .map(type => {
-          if (type === Integration.Guild) return ApplicationIntegrationType.GuildInstall;
-          if (type === Integration.User) return ApplicationIntegrationType.UserInstall
+          if (type === "Guild") return ApplicationIntegrationType.GuildInstall;
+          if (type === "User") return ApplicationIntegrationType.UserInstall
         })
         .filter((type): type is ApplicationIntegrationType => type!== undefined)
       )
       .setContexts(
         slash.contexts
        .map(context => {
-          if (context === Context.Guild) return InteractionContextType.Guild;
-          if (context === Context.DM) return InteractionContextType.PrivateChannel;
-          if (context === Context.Bot) return InteractionContextType.BotDM
+          if (context === "Guild") return InteractionContextType.Guild;
+          if (context === "DM") return InteractionContextType.PrivateChannel;
+          if (context === "Bot") return InteractionContextType.BotDM
         })
        .filter((context): context is InteractionContextType => context!== undefined)
       );
@@ -226,9 +196,9 @@ export namespace Slash {
   export function AppendToSlash(builder: SlashCommandBuilder, item: { name: string } & Slash.OptionHandler<keyof Slash.OptionDict>) {
     if(item.type == "command" || item.type == "group") {
       builder[item.type == "command" ? "addSubcommand" : "addSubcommandGroup"]((builder: any) => {
-        for(const name in item.body) {
-          const body = item.body[name];
-          if(!body) continue;
+        for(const name in item.args) {
+          const body = item.args[name];
+          if (!body) continue;
           AppendToSlash(builder as any, { name, ...body });
         };
 
@@ -250,6 +220,7 @@ export namespace Slash {
       case "number": {
         if(item.isInt) builder.addNumberOption((option) => option.setName(item.name).setDescription(item.description).setMaxValue(item.max ?? Infinity).setMinValue(item.min ?? -Infinity).setRequired(!!item.required));
         else builder.addNumberOption((option) => option.setName(item.name).setDescription(item.description).setMaxValue(item.max ?? Infinity).setMinValue(item.min ?? -Infinity).setRequired(!!item.required));
+
         break;
       };
       case "role": {
@@ -263,10 +234,6 @@ export namespace Slash {
           };
           return option;
         });
-        break;
-      };
-      case "attachment": {
-        builder.addAttachmentOption((option) => option.setName(item.name).setDescription(item.description).setRequired(!!item.required))
         break;
       };
       case "user": {
@@ -293,10 +260,6 @@ export namespace Slash {
           data[option.name] = option.value;
           break;
         };
-        case "attachment": {
-          data[option.name] = option.attachment;
-          break;
-        };
         case "channel": {
           data[option.name] = option.channel;
           break;
@@ -319,7 +282,7 @@ export namespace Slash {
         };
         case "group":
         case "command": {
-          data[option.name] = GetSlashCommands(option.options as any, item.body);
+          data[option.name] = GetSlashCommands(option.options as any, item.args);
           break;
         };
       };

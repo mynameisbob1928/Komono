@@ -4,12 +4,16 @@ import Prisma from "utils/database";
 import { Locales } from "utils/locales";
 
 export default Slash.Create({
-    name: "ping",
-    type: Slash.SlashType.Command,
-    integrations: [Slash.Integration.Guild, Slash.Integration.User],
-    contexts: [Slash.Context.Bot, Slash.Context.DM, Slash.Context.Guild],
-    description: "Check if the bot is alive",
-    category: "Core",
+    body: {
+        name: "ping",
+        type: "Command",
+        integrations: ["Guild", "User"],
+        contexts: ["Guild", "DM", "Bot"],
+        description: "Check if the bot is alive",
+        category: "Core",
+        cooldown: 3000,
+        args: {}
+    },
     defer: true,
     async callback(interaction, args) {
         // REST

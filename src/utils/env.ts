@@ -16,7 +16,7 @@ export namespace Env {
     };
 
     ToInt() {
-      return Math.floor(this.ToNumber( ));
+      return Math.floor(this.ToNumber());
     };
 
     ToArray() {
@@ -65,7 +65,7 @@ export namespace Env {
   };
 
   export function Save() {
-    fs.writeFileSync(Path, ToString( ));
+    fs.writeFileSync(Path, ToString());
   };
 
   export function Default() {};
@@ -86,6 +86,8 @@ export namespace Env {
     const content = fs.readFileSync(Path, "utf-8");
   
     content.split("\r\n").forEach((item) => {
+      if (item.trim().startsWith("#")) return;
+      
       const [key, ...rest] = item.split(":");
       if (key) {
         Cache[key] = rest.join(":");

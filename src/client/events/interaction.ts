@@ -54,7 +54,7 @@ export default Event.Create({
                     await command.callback(interaction, {
                         name: command.name,
                         description: command.description,
-                        args: Slash.GetSlashCommands(interaction.options.data as any, command.args)
+                        body: Slash.GetSlashCommands(interaction.options.data as any, command.args ?? {})
                     });
                 } catch (e) {
                     Log.Write(e, "red");

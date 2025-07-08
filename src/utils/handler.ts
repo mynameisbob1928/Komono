@@ -5,6 +5,7 @@ import { Slash } from "bases/slash";
 import { Prefix } from "bases/prefix";
 import { Component } from "bases/component";
 import { Env } from "./env";
+import path from "path";
 
 export namespace Handler {
   export type Paths = {
@@ -26,9 +27,9 @@ export namespace Handler {
     components: new Collection<string, ComponentType>()
   };
 
-  export function ReadDirRecursive(path: string, callback: (path: string, filename: string) => any): any[] {
-    return fs.readdirSync(path).map((filename) => {
-      const filepath = `${path}\\${filename}`;
+  export function ReadDirRecursive(dir: string, callback: (filepath: string, filename: string) => any): any[] {
+    return fs.readdirSync(dir).flatMap((filename) => {
+      const filepath = path.join(dir, filename);
 
       if(fs.statSync(filepath).isDirectory()) {
         return ReadDirRecursive(filepath, callback);

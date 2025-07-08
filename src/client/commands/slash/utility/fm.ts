@@ -1,23 +1,30 @@
-import { Prefix } from "bases/prefix";
+import { Slash } from "bases/slash";
 import Prisma from "utils/database";
 import { Embed } from "utils/embed";
 import { Env } from "utils/env";
 import { Markdown } from "utils/markdown";
 import { Request } from "utils/request";
 
-export default Prefix.Create({
-    name: "lastfm",
-    aliases: ["fm"],
-    description: "Show the music that you're listening to",
-    category: "Utility",
-    cooldown: 5000,
-    args: [{ name: "user", type: "string", description: "Your lastfm username"}],
-    async callback(client, message, args) {
-        const userId = message.author.id;
+export default Slash.Create({
+    body: {
+        name: "lastfm",
+        type: "Command",
+        integrations: ["Guild", "User"],
+        contexts: ["Guild", "DM", "Bot"],
+        description: "Show the music that you're listening to",
+        category: "Utility",
+        cooldown: 5000,
+        args: {
+            user: { type: "string", description: "Your lastfm username" }
+        }
+    },
+    defer: true,
+    async callback(interaction, args) {
+        const userId = interaction.user.id;
         const key = Env.Required("lastfm").ToString();
 
-        if (args.user) {
-            const username = args.user;
+        if (args.body.user) {
+            const username = args.body.user;
 
             await Prisma.lastfm.upsert({
                 where: { userId },
@@ -25,7 +32,7 @@ export default Prefix.Create({
                 create: { userId, username }
             });
 
-            await message.reply({
+            await interaction.editReply({
                 embeds: [Embed.Success({
                     description: `Last.fm username saved as **${username}**!`
                 })]
@@ -36,7 +43,7 @@ export default Prefix.Create({
         const data = await Prisma.lastfm.findUnique({ where: { userId} });
 
         if (!data) {
-            await message.reply({
+            await interaction.editReply({
                 embeds: [Embed.Error({
                     description: `${Markdown.Icon("Error")} You need to set your Last.fm username first with the command, e.g., k.lastfm <username>.`
                 })]
@@ -59,7 +66,7 @@ export default Prefix.Create({
         });
 
         if (!userInfo) {
-            await message.reply({
+            await interaction.editReply({
                 embeds: [Embed.Error({
                     description: `${Markdown.Icon("Error")} Username "${username}" is invalid. Please update it using the command k.lastfm <username>.`
                 })]
@@ -69,7 +76,7 @@ export default Prefix.Create({
 
         const track = recentTracks.recenttracks.track[0];
         if (!track) {
-            await message.reply({
+            await interaction.editReply({
                 embeds: [Embed.Error({
                     description: `${Markdown.Icon("Error")} No recent tracks found.`
                 })]
@@ -79,7 +86,7 @@ export default Prefix.Create({
 
         const nowPlaying = track["@attr"]?.nowplaying === "true";
         if (!nowPlaying) {
-            await message.reply({
+            await interaction.editReply({
                 embeds: [Embed.Error({
                     description: `${Markdown.Icon("Error")} No track playing right now.`
                 })]
@@ -87,8 +94,8 @@ export default Prefix.Create({
             return;
         };
 
-        await message.reply({
-            content: `${message.author} is playing ${Markdown.Link(track.url, track.name)} by ${track.artist["#text"]}`,
+        await interaction.editReply({
+            content: `${interaction.user} is playing ${Markdown.Link(track.url, track.name)} by ${track.artist["#text"]}`,
             embeds: [Embed.Create({
                 title: `${track.name} — ${track.artist["#text"]}`,
                 url: track.url,
