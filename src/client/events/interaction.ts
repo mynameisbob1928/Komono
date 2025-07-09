@@ -15,7 +15,7 @@ export default Event.Create({
         switch (interaction.type) {
             case InteractionType.ApplicationCommand:
                 if (!interaction.isChatInputCommand()) return;
-                const command = Handler.Slashes.Find(interaction.client, interaction.commandName);
+                const command = interaction.client.slashes.find((slash: Handler.SlashType) => slash.name === interaction.commandName);
                 if (!command) return;
                 Log.Write(`Received command interaction: ${command.name}`, "green");
                 const dev = Env.Required("dev").ToArray();
@@ -77,11 +77,11 @@ export default Event.Create({
                 };
                 break;
             case InteractionType.MessageComponent:
-                const [name, ...args] = interaction.customId.split("-");
-                if (!name || !args) return;
+                const [id, ...args] = interaction.customId.split("-");
+                if (!id || !args) return;
                 if (interaction.isButton()) {
                     Log.Write(`Received button interaction: ${interaction.customId}`, "green");
-                    const button = Handler.Components.Find(interaction.client, name);
+                    const button = interaction.client.components.find((component: Handler.ComponentType) => component.id === id);
                     if (!button) return;
                     try {
                         await button.callback(interaction, args);
@@ -90,7 +90,7 @@ export default Event.Create({
                     };
                 } else if (interaction.isAnySelectMenu()) {
                     Log.Write(`Received select menu interaction: ${interaction.customId}`, "green");
-                    const menu = Handler.Components.Find(interaction.client, name);
+                    const menu = interaction.client.components.find((component: Handler.ComponentType) => component.id === id);
                     if (!menu) return;
                     try {
                         await menu.callback(interaction, args);
@@ -101,9 +101,9 @@ export default Event.Create({
                 break;
             case InteractionType.ModalSubmit:
                 Log.Write(`Received modal submit interaction: ${interaction.customId}`, "green");
-                const [modalName, ...modalArgs] = interaction.customId.split("-");
-                if (!modalName || !modalArgs) return;
-                const modal = Handler.Components.Find(interaction.client, modalName);
+                const [modalId, ...modalArgs] = interaction.customId.split("-");
+                if (!modalId || !modalArgs) return;
+                const modal = interaction.client.components.find((component: Handler.ComponentType) => component.id === modalId);
                 if (!modal) return;
                 try {
                     await modal.callback(interaction, modalArgs);

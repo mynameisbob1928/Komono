@@ -20,7 +20,7 @@ export default Event.Create({
         const name = message.content.slice(prefix.length).trim().split(/\s+/).shift()?.toLowerCase();
         if (!name) return;
 
-        const command = Handler.Prefixes.Find(message.client, name);
+        const command = message.client.prefixes.find((prefix: Handler.PrefixType) => prefix.name === name || prefix.aliases.includes(name));
         if (!command) return;
 
         Log.Write(`Received command interaction: ${command.name}`, "green");

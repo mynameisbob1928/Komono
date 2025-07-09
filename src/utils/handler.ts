@@ -122,10 +122,6 @@ export namespace Handler {
       await Rest.put(Routes.applicationCommands(client.user.id), { body: Cache.slashes.map((slash) => Slash.ToJSON(slash)) });
       return;
     };
-    
-    export function Find(client: Client, name: string) {
-      return client.slashes.find((slash: SlashType) => slash.name === name);
-    };
   };
   
   export namespace Prefixes {
@@ -135,10 +131,6 @@ export namespace Handler {
       await Load(path, client.prefixes) as PrefixType[];
       return;
     };
-
-    export function Find(client: Client, name: string) {
-      return client.prefixes.find((prefix: PrefixType) => prefix.name === name || prefix.aliases.includes(name));
-    };
   };
 
   export namespace Components {
@@ -147,10 +139,6 @@ export namespace Handler {
 
       await Load(path, client.components) as ComponentType[];
       return;
-    };
-
-    export function Find(client: Client, id: string) {
-      return client.components.find((component: ComponentType) => component.id === id);
     };
   }
 };

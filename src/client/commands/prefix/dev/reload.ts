@@ -20,10 +20,10 @@ export default Prefix.Create({
                 await Handler.Slashes.Reload(client, path.join(__dirname, "../../slash"));
                 break;
             case "prefix":
-                await Handler.Prefixes.Reload(path.join(__dirname, ".."));
+                await Handler.Prefixes.Reload(client, path.join(__dirname, ".."));
                 break;
             case "component":
-                await Handler.Components.Reload(path.join(__dirname, "../../../components"));
+                await Handler.Components.Reload(client, path.join(__dirname, "../../../components"));
                 break;
             default:
                 await message.reply("Invalid type! Use: event, slash, prefix, or component.");
