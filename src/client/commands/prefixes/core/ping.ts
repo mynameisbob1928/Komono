@@ -1,9 +1,8 @@
 import { Prefix } from "bases/prefix";
 import { Routes } from "discord.js";
-import { Button } from "utils/button";
-import Prisma from "utils/database";
+import { Prisma } from "utils/database";
 
-export default Prefix.Create({
+export default Prefix({
     name: "ping",
     description: "Check if the bot is alive",
     category: "Core",

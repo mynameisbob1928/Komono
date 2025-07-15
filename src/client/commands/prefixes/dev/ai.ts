@@ -1,8 +1,8 @@
 import { Prefix } from "bases/prefix";
 import Together from "together-ai";
-import { Env } from "utils/env";
+import { Required } from "utils/env";
 
-export default Prefix.Create({
+export default Prefix({
     name: "ask",
     description: "Ask AI anything you want",
     category: "Dev",
@@ -10,8 +10,8 @@ export default Prefix.Create({
     dev: true,
     args: [{ name: "msg", type: "string", description: "Message to send to the AI for processing" }],
     async callback(client, message, args) {
-        const model = Env.Required("together_model").ToString();
-        const key = Env.Required('together_key').ToString();
+        const model = Required("together_model").ToString();
+        const key = Required('together_key').ToString();
         const instruction = `You are a friendly chatbot named Komono, designed to assist people. Today's date is ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}. Always use gender-neutral pronouns when possible. Be concise and to the point. Keep responses under 2000 characters. Respond naturally using Markdown formatting.`
         const msg = args.msg;
 

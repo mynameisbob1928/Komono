@@ -1,9 +1,9 @@
 import { Slash } from "bases/slash";
 import { Routes } from "discord.js";
-import Prisma from "utils/database";
-import { Locales } from "utils/locales";
+import { Prisma } from "utils/database";
+import { Translate } from "utils/locales";
 
-export default Slash.Create({
+export default Slash({
     body: {
         name: "ping",
         type: "Command",
@@ -26,6 +26,6 @@ export default Slash.Create({
         const dbLatency = Math.round((performance.now() - dbStart));
         
         const l = interaction.locale;
-        await interaction.editReply(Locales.Translate("pong", l, [(interaction.guild?.shardId ?? "N/A"), interaction.client.ws.ping, restLatency, dbLatency]));
+        await interaction.editReply(Translate("pong", l, [(interaction.guild?.shardId ?? "N/A"), interaction.client.ws.ping, restLatency, dbLatency]));
     }
 });

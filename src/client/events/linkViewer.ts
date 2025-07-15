@@ -1,7 +1,7 @@
 import { Event } from "bases/event";
-import { Log } from "utils/log";
+import { Write } from "utils/log";
 
-export default Event.Create({
+export default Event({
     name: "linkViewer",
     type: "messageCreate",
     async callback(message) {
@@ -21,9 +21,8 @@ export default Event.Create({
 
                 await linkedMessage.forward(message.channel);
             };
-
         } catch (e) {
-            Log.Write(e);
+            Write(e, "red");
         };
     }
 });

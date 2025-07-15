@@ -1,6 +1,6 @@
 import { Prefix } from "bases/prefix";
 
-export default Prefix.Create({
+export default Prefix({
     name: "echo",
     description: "Repeats the message you send",
     category: "Dev",

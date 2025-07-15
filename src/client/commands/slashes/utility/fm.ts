@@ -1,13 +1,12 @@
 import { Slash } from "bases/slash";
-import Prisma from "utils/database";
+import { Prisma } from "utils/database";
 import { Embed } from "utils/embed";
-import { Env } from "utils/env";
-import { Log } from "utils/log";
-import { Markdown } from "utils/markdown";
+import { Required } from "utils/env";
+import { Icon, Link } from "utils/markdown";
 import { Request } from "utils/request";
-import { Utils } from "utils/utils";
+import { Commas } from "utils/utils";
 
-export default Slash.Create({
+export default Slash({
     body: {
         name: "lastfm",
         type: "Command",
@@ -21,7 +20,7 @@ export default Slash.Create({
     defer: true,
     async callback(interaction, args) {
         const userId = interaction.user.id;
-        const key = Env.Required("lastfm").ToString();
+        const key = Required("lastfm").ToString();
 
         if (args.body.user) {
             const username = args.body.user;
@@ -33,7 +32,7 @@ export default Slash.Create({
             });
 
             await interaction.editReply({
-                embeds: [Embed.Success({
+                embeds: [Embed({
                     description: `Last.fm username saved as **${username}**!`
                 })]
             });
@@ -44,8 +43,9 @@ export default Slash.Create({
 
         if (!data) {
             await interaction.editReply({
-                embeds: [Embed.Error({
-                    description: `${Markdown.Icon("Error")} You need to set your Last.fm username first with the command, e.g., k.lastfm <username>.`
+                embeds: [Embed({
+                    description: `${Icon("Error")} You need to set your Last.fm username first with the command, e.g., k.lastfm <username>.`,
+                    color: "Red"
                 })]
             });
             return;
@@ -53,13 +53,13 @@ export default Slash.Create({
 
         const username = data.username;
 
-        const recentTracks = await Request.Request({
+        const recentTracks = await Request({
             url: `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${encodeURIComponent(username)}&api_key=${key}&format=json&limit=1`,
             method: "GET",
             response: "JSON"
         });
 
-        const userInfo = await Request.Request({
+        const userInfo = await Request({
             url: `https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${encodeURIComponent(username)}&api_key=${key}&format=json&limit=1`,
             method: "GET",
             response: "JSON"
@@ -67,8 +67,9 @@ export default Slash.Create({
 
         if (!userInfo) {
             await interaction.editReply({
-                embeds: [Embed.Error({
-                    description: `${Markdown.Icon("Error")} Username "${username}" is invalid. Please update it using the command k.lastfm <username>.`
+                embeds: [Embed({
+                    description: `${Icon("Error")} Username "${username}" is invalid. Please update it using the command k.lastfm <username>.`,
+                    color: "Red"
                 })]
             });
             return;
@@ -77,8 +78,9 @@ export default Slash.Create({
         const track = recentTracks.recenttracks.track[0];
         if (!track) {
             await interaction.editReply({
-                embeds: [Embed.Error({
-                    description: `${Markdown.Icon("Error")} No recent tracks found.`
+                embeds: [Embed({
+                    description: `${Icon("Error")} No recent tracks found.`,
+                    color: "Red"
                 })]
             });
             return;
@@ -87,19 +89,20 @@ export default Slash.Create({
         const nowPlaying = track["@attr"]?.nowplaying === "true";
         if (!nowPlaying) {
             await interaction.editReply({
-                embeds: [Embed.Error({
-                    description: `${Markdown.Icon("Error")} No track playing right now.`
+                embeds: [Embed({
+                    description: `${Icon("Error")} No track playing right now.`,
+                    color: "Red"
                 })]
             });
             return;
         };
 
         await interaction.editReply({
-            content: `${interaction.user} is playing ${Markdown.Link(track.url, track.name)} by ${track.artist["#text"]}`,
-            embeds: [Embed.Create({
+            content: `${interaction.user} is playing ${Link(track.url, track.name)} by ${track.artist["#text"]}`,
+            embeds: [Embed({
                 title: `${track.name} — ${track.artist["#text"]}`,
                 url: track.url,
-                description: `Album: ${track.album["#text"] ? `**${track.album["#text"]}**` : "**Album not found**"} ・ Scrobbles: **${Utils.Commas(userInfo.user.playcount) || "N/A"}**`,
+                description: `Album: ${track.album["#text"] ? `**${track.album["#text"]}**` : "**Album not found**"} ・ Scrobbles: **${Commas(userInfo.user.playcount) || "N/A"}**`,
                 thumb: track.image[2]["#text"]
             })]
         });

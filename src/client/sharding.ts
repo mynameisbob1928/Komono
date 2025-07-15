@@ -1,9 +1,9 @@
 import { ClusterManager } from 'status-sharding';
-import { Env } from 'utils/env';
-import { Log } from 'utils/log';
+import { Required } from 'utils/env';
+import { Write } from 'utils/log';
 
 const client = 'src/client/app.ts';
-const token = Env.Required("token").ToString();
+const token = Required("token").ToString();
 
 const manager = new ClusterManager(client, {
     mode: "process",
@@ -22,24 +22,24 @@ const manager = new ClusterManager(client, {
 });
 
 process.on("uncaughtException", (error) => {
-  Log.Write(`Uncaught Exception: ${error}`, "red");
+  Write(`Uncaught Exception: ${error}`, "red");
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  Log.Write(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, "red");
+  Write(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, "red");
 });
 
 process.on("warning", (warning) => {
-  Log.Write(`WARNING: ${warning.name} : ${warning.message}`, "red");
+  Write(`WARNING: ${warning.name} : ${warning.message}`, "red");
 });
 
 manager.on("clusterCreate", (cluster) => {
   cluster.on("ready", () => {
-    Log.Write(`Cluster ${cluster.id} is ready!`, "green")
+    Write(`Cluster ${cluster.id} is ready!`, "green")
   });
 
   cluster.on("death", (cluster) => {
-    Log.Write(`Cluster ${cluster.id} died.`, "red")
+    Write(`Cluster ${cluster.id} died.`, "red")
   });
 });
 

@@ -1,71 +1,61 @@
 import { SnowflakeUtil, type Message } from "discord.js";
-import Prisma from "./database";
+import fs from "fs";
+import path from "path";
 
-export namespace Utils {
-  export const ReadableFileSizeUnits = ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+export function TimeFormat(duration: number | string) {
+  const total = Math.floor(Number(duration) / 1000);
+  const days = Math.floor(total / (24 * 60 * 60));
+  const hours = Math.floor((total % (24 * 60 * 60)) / (60 * 60));
+  const minutes = Math.floor((total % (60 * 60)) / 60);
+  const seconds = total % 60;
+  const milliseconds = Math.floor(Number(duration) % 1000 / 100);
 
-  export function ReadableFileSize(bytes: number, micro = false, precision = 1) {
-    const thresh = micro ? 1000 : 1024;
+  const parts = [];
 
-    if (Math.abs(bytes) < thresh) {
-      return `${bytes} B`;
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  if (seconds > 0) parts.push(`${seconds}s`);
+  if (milliseconds > 0 || (parts.length === 0 && Number(duration) < 1000)) parts.push(`${milliseconds}ms`);
+
+  return parts.join(" ");
+};
+
+export async function Reference(message: Message) {
+  let last = message;
+  let after = SnowflakeUtil.generate({ timestamp: message.createdTimestamp -1 }).toString();
+
+  return (await message.channel.messages.fetch({ after })).reduce((list, current) => {
+    if (current.reference && current.reference.messageId === last.id && current.author.id === message.author.id) {
+      last = current;
+      list.push(current);
     };
 
-    let unit = -1;
+    return list;
+  }, [] as Message[]);
+};
 
-    const round = 10 ** precision;
+export function Commas(num: number | string) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 
-    do {
-      bytes /= thresh;
-      ++ unit;
-    } while (((Math.round(Math.abs(bytes) * round) / round) >= thresh) && (unit < (ReadableFileSizeUnits.length - 1)));
+export function ReadDirRecursive(dir: string, callback: (filepath: string, filename: string) => any): any[] {
+  return fs.readdirSync(path.resolve(dir)).flatMap((filename) => {
+    const filepath = path.resolve(dir, filename);
 
-    return `${bytes.toFixed(precision)} ${ReadableFileSizeUnits[unit]}`;
-  };
+    if (fs.statSync(filepath).isDirectory()) {
+      return ReadDirRecursive(filepath, callback);
+    };
 
-  export function Format(duration: number | string) {
-    const total = Math.floor(Number(duration) / 1000);
-    const days = Math.floor(total / (24 * 60 * 60));
-    const hours = Math.floor((total % (24 * 60 * 60)) / (60 * 60));
-    const minutes = Math.floor((total % (60 * 60)) / 60);
-    const seconds = total % 60;
-    const milliseconds = Math.floor(Number(duration) % 1000 / 100);
+    return callback(filepath, filename);
+  });
+};
 
-    const parts = [];
-    if (days > 0) parts.push(`${days}d`);
-    if (hours > 0) parts.push(`${hours}h`);
-    if (minutes > 0) parts.push(`${minutes}m`);
-    if (seconds > 0) parts.push(`${seconds}s`);
-    if (milliseconds > 0 || (parts.length === 0 && Number(duration) < 1000)) parts.push(`${milliseconds}ms`);
+export function Debounce(fn: any, delay: number) {
+  let timeout: any;
 
-    return parts.join(" ");
-  };
-
-  export async function Reference(message: Message) {
-    let last = message;
-    let after = SnowflakeUtil.generate({ timestamp: message.createdTimestamp -1 }).toString();
-
-    return (await message.channel.messages.fetch({ after })).reduce((list, current) => {
-      if (current.reference && current.reference.messageId == last.id && current.author.id == message.client.user.id) {
-        last = current;
-        list.push(current);
-      };
-
-      return list;
-    }, [] as Message[]);
-  };
-
-  export async function Prefix(guildId: string): Promise<string> {
-    const data = await Prisma.prefix.upsert({
-      where: { guildId },
-      update: {},
-      create: { guildId }
-    });
-       
-    return data.prefix;
-  };
-
-  export function Commas(num: number | string) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return function (...args: any) {
+    clearTimeout(timeout);
+    timeout = setTimeout(fn.bind(null, ...args), delay);
   };
 };
