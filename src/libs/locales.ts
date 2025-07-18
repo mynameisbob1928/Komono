@@ -3,11 +3,10 @@ import fs from 'fs';
 
 const path = join(__dirname, '../locales');
 const fallback = "en";
-const supportedLanguages = ["en", "pt", "fr"];
+const supportedLanguages = ["en-US", "pt-BR"];
 
 export function Translate(key: string, lang: string, params: (string | number)[] = []): string {
-    const shortLang = lang.split('-')[0] || fallback;
-    const finalLang = supportedLanguages.includes(shortLang) ? shortLang : fallback;
+    const finalLang = supportedLanguages.includes(lang) ? lang : fallback;
 
     const filePath = `${path}/${finalLang}/${finalLang}.json`;
 
