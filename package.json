@@ -1,12 +1,12 @@
 {
   "name": "titanium",
-  "module": "sharding.ts",
+  "module": "app.ts",
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "bun run src/client/sharding.ts",
-    "database": "bunx prisma migrate dev --name init",
-    "generate": "bunx prisma generate --no-engine"
+    "start": "bun run src/client/manager.ts",
+    "database:init": "bunx prisma migrate dev --name init",
+    "database:generate": "bunx prisma generate --no-engine"
   },
   "devDependencies": {
     "@types/bun": "latest"
@@ -15,6 +15,8 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@discordjs/voice": "^0.18.0",
+    "@elevenlabs/elevenlabs-js": "^2.6.0",
     "@prisma/client": "^6.11.1",
     "@prisma/extension-accelerate": "^2.0.1",
     "discord.js": "^14.21.0",

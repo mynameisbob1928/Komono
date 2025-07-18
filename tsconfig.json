@@ -29,7 +29,9 @@
     "baseUrl": "./src",
     "paths": {
       "bases/*": ["bases/*"],
+      "libs/*": ["libs/*"],
       "utils/*": ["utils/*"],
+      "types/*": ["types/*"],
       "client/*": ["client/*"]
     }
   }
