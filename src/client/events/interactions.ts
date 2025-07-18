@@ -6,8 +6,8 @@ import Slash from "../../bases/slash";
 import { Env } from "../../libs/env";
 import { Codeblock, Highlight, Link } from "../../utils/markdown";
 import { Cooldown } from "../../utils/cooldown";
-import { Component } from "../../libs/component";
-import { Container } from "../../libs/container";
+import { Component } from "../../utils/component";
+import { Container } from "../../utils/container";
 
 export default new Event({
     name: "interactions",

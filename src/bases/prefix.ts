@@ -1,20 +1,29 @@
-import type { Client, Message } from "discord.js";
+import type { Client, Message, Role, User, GuildMember, ChannelType } from "discord.js";
 import type { CommandPermission, Optional } from "types/types";
-import type { Args } from "libs/arg";
+import type { Args } from "utils/arg";
 
-export interface CommandProps {
+export type PrefixResolvedItem<T extends Args.ArgsItems> =
+    T extends Args.ArgsItemRole ? Role
+  : T extends Args.ArgsItemUser ? T["isMember"] extends true ? GuildMember : User
+  : T extends Args.ArgsItemString ? string
+  : T extends Args.ArgsItemNumber ? number
+  : T extends Args.ArgsItemBoolean ? boolean
+  : T extends Args.ArgsItemChannel ? T["channelType"] extends Array<keyof typeof ChannelType> ? (typeof ChannelType)[T["channelType"][number]] : (typeof ChannelType)[ChannelType]
+  : never;
+
+export interface PrefixProps<T extends Record<string, Args.ArgsItems>> {
     name: string;
-    aliases: string[];
+    aliases?: string[];
     description: string;
-    cooldown: number;
-    permissions: CommandPermission;
-    nsfw: boolean;
-    dev: boolean;
-    args: Args.ArgsItems[]
-    run(client: Client, message: Message, args: Record<string, any>): any;
+    cooldown?: number;
+    permissions?: CommandPermission;
+    nsfw?: boolean;
+    dev?: boolean;
+    args?: T;
+    run(client: Client, message: Message, args: { [K in keyof T]: PrefixResolvedItem<T[K]> }): any;
 };
 
-export default class Prefix {
+export default class Prefix<T extends Record<string, Args.ArgsItems>> {
     public name;
     public aliases;
     public cooldown;
@@ -24,7 +33,7 @@ export default class Prefix {
     public args;
     public run;
 
-    constructor(props: Optional<CommandProps, "aliases" | "cooldown" | "args" | "permissions" | "nsfw" | "dev" | "args">) {
+    constructor(props: Optional<PrefixProps<T>, "aliases" | "cooldown" | "args" | "permissions" | "nsfw" | "dev">) {
         props.permissions = props.permissions || { client: [], author: [] };
 
         this.name = props.name;
@@ -33,7 +42,7 @@ export default class Prefix {
         this.permissions = props.permissions;
         this.nsfw = !!props.nsfw;
         this.dev = !!props.dev;
-        this.args = props.args || []
-        this.run = props.run
+        this.args = props.args || {};
+        this.run = props.run;
     };
 };

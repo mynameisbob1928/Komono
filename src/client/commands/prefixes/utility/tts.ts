@@ -1,7 +1,7 @@
 import Prefix from "bases/prefix";
-import { Component } from "libs/component";
+import { Component } from "utils/component";
 import { ButtonStyle, ChannelType, MessageFlags, SeparatorSpacingSize } from "discord.js";
-import { Container } from "libs/container";
+import { Container } from "utils/container";
 
 export default new Prefix({
     name: "tts",

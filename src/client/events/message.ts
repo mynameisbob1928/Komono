@@ -4,10 +4,10 @@ import { Env } from "../../libs/env";
 import type { PrefixType } from "../../types/types";
 import { Log } from "../../utils/log";
 import { Codeblock, Highlight, Icon, Link } from "../../utils/markdown";
-import { Component } from "../../libs/component";
-import { Container } from "../../libs/container";
+import { Component } from "../../utils/component";
+import { Container } from "../../utils/container";
 import { Cooldown } from "../../utils/cooldown";
-import { Args } from "../../libs/arg";
+import { Args } from "../../utils/arg";
 
 export default new Event({
     name: "message",

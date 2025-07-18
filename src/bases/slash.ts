@@ -1,8 +1,11 @@
-import { GuildMember, Role, SlashCommandBuilder, User, type LocalizationMap, ChannelType, ChatInputCommandInteraction, Locale, AutocompleteInteraction, type CacheType } from "discord.js";
+import { GuildMember, Role, SlashCommandBuilder, User, type LocalizationMap, ChannelType, ChatInputCommandInteraction, Locale, AutocompleteInteraction, type CacheType, ApplicationIntegrationType, InteractionContextType } from "discord.js";
 import type { allowedChannelTypes, CommandPermission, Optional } from "types/types";
 
 export type SlashType = "command" | "channel" | "boolean" | "string" | "number" | "option" | "group" | "user" | "role";
 export type SlashLocalization = (Partial<Record<keyof LocalizationMap, string>> & { global: string; }) | string;
+
+export type Integrations = "guild" | "user";
+export type Contexts = "guild" | "DM" | "bot"
 
 export interface BaseItem<T extends SlashType> {
     name?: SlashLocalization;
@@ -86,6 +89,8 @@ export type SlashResolvedItem<T extends SlashItem> =
 export interface SlashProps<T extends Record<string, SlashItem>> {
     name: SlashLocalization;
     description: SlashLocalization;
+    integrations: Integrations[];
+    contexts: Contexts[];
     body: T;
     cooldown: number;
     permissions: CommandPermission;
@@ -100,6 +105,8 @@ export interface SlashProps<T extends Record<string, SlashItem>> {
 export default class Slash<T extends Record<string, SlashItem>> {
   public name;
   public description;
+  public integrations;
+  public contexts;
   public body;
   public cooldown;
   public permissions;
@@ -114,6 +121,15 @@ export default class Slash<T extends Record<string, SlashItem>> {
     const base = new SlashCommandBuilder()
     .setName(typeof props.name === "string" ? props.name : props.name.global)
     .setDescription(typeof props.description === "string" ? props.description : props.description.global)
+    .setIntegrationTypes(props.integrations.map(i => {
+      if (i === "guild")  return ApplicationIntegrationType.GuildInstall;
+      if (i === "user") return ApplicationIntegrationType.UserInstall;
+    }).filter((type): type is ApplicationIntegrationType => type !== undefined))
+    .setContexts(props.contexts.map(i => {
+      if (i === "bot") return InteractionContextType.BotDM;
+      if (i === "guild") return InteractionContextType.Guild;
+      if (i === "DM") return InteractionContextType.PrivateChannel;
+    }).filter((type): type is InteractionContextType => type !== undefined));
 
     if (typeof props.name !== "string") {
       for (const [locale, value] of Object.entries(props.name)) {
@@ -317,6 +333,8 @@ export default class Slash<T extends Record<string, SlashItem>> {
 
     this.name = props.name;
     this.description = props.description;
+    this.integrations = props.integrations;
+    this.contexts = props.contexts;
     this.body = props.body;
     this.cooldown = props.cooldown;
     this.permissions = props.permissions;

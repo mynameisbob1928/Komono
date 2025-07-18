@@ -51,12 +51,16 @@ export namespace Args {
         | ArgsItemBoolean
         | ArgsItemChannel
 
-    export async function Parse(client: Client, message: Message, args: ArgsItems[]) {
+    export async function Parse(client: Client, message: Message, args: Record<string, ArgsItems>) {
         const solved: Record<string, any> = {};
         const input = message.content.match(/(?:[^\s"']+|"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)')+/g)?.slice(1) || [];
 
-        for (let i = 0; i < args.length; i++) {
-            const arg = args[i];
+        const argEntries = Object.entries(args);
+
+        for (let i = 0; i < argEntries.length; i++) {
+            const entry = argEntries[i];
+            if (!entry) continue;
+            const arg = entry[1];
             if (!arg) continue;
 
             let raw = input.shift();
@@ -70,7 +74,7 @@ export namespace Args {
                 continue;
             };
 
-            if (arg.type === "string" && i === args.length - 1) {
+            if (arg.type === "string" && i === argEntries.length - 1) {
                 raw = [raw, ...input].join(" ");
                 input.length = 0;
             };
@@ -177,7 +181,7 @@ export namespace Args {
 
                         solved[arg.name] = user;
                     } else {
-                        if (args[i + 1]) {
+                        if (argEntries[i + 1]) {
                             input.unshift(value);
                             continue;
                         } else {
