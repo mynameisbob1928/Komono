@@ -10,6 +10,7 @@ export default new Prefix({
         author: ["ManageGuild"],
         client: []
     },
+    dev: true,
     async run(client, message, args) {
         const text1 = Component.Create({
             type: "textDisplay",
@@ -28,7 +29,7 @@ export default new Prefix({
 
         const text4 = Component.Create({
             type: "textDisplay",
-            content: "Enable auto-detect:\n- If enabled, Komono will read all messages, not just mentions\n-# Example: @komono Hello chat -> Hello chat"
+            content: "Auto-detect:\n- If enabled, Komono will read all messages, not just mentions\n-# Example: @komono Hello chat -> Hello chat"
         });
 
         const text5 = Component.Create({
@@ -55,7 +56,7 @@ export default new Prefix({
         });
 
         const action1 = Component.CreateActionRow([channelSelectMenu]);
-        const action2 = Component.CreateActionRow([stringSelectMenu])
+        const action2 = Component.CreateActionRow([stringSelectMenu]);
 
         const button1 = Component.Create({
             type: "button",
@@ -67,7 +68,7 @@ export default new Prefix({
         const button2 = Component.Create({
             type: "button",
             customId: "dataWipeTTS",
-            text: "Delete all data",
+            text: "Reset",
             color: ButtonStyle.Danger
         });
 

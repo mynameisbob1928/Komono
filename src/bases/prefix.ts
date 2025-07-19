@@ -5,8 +5,8 @@ import type { Args } from "utils/arg";
 export type PrefixResolvedItem<T extends Args.ArgsItems> =
     T extends Args.ArgsItemRole ? Role
   : T extends Args.ArgsItemUser ? T["isMember"] extends true ? GuildMember : User
-  : T extends Args.ArgsItemString ? string
-  : T extends Args.ArgsItemNumber ? number
+  : T extends Args.ArgsItemString ? T["choices"] extends Record<string, string> ? { target: keyof T["choices"], value: string; } : string
+  : T extends Args.ArgsItemNumber ? T["choices"] extends Record<string, number> ? { target: keyof T["choices"], value: number; } : number
   : T extends Args.ArgsItemBoolean ? boolean
   : T extends Args.ArgsItemChannel ? T["channelType"] extends Array<keyof typeof ChannelType> ? (typeof ChannelType)[T["channelType"][number]] : (typeof ChannelType)[ChannelType]
   : never;

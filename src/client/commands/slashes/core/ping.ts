@@ -8,9 +8,9 @@ export default new Slash({
     cooldown: 3,
     integrations: ["guild", "user"],
     contexts: ["guild", "bot", "DM"],
-    body: {},
+    args: {},
     defer: true,
-    async run(interaction, options) {
+    async run(interaction, args) {
         // REST
         const restStart = performance.now();
         await interaction.client.rest.get(Routes.user("@me"));

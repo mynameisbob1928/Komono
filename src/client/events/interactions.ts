@@ -60,7 +60,7 @@ export default new Event({
                 };
 
                 try {
-                    await command.run(interaction, Slash.Resolve(interaction, command.body));
+                    await command.run(interaction, Slash.Resolve(interaction, command.args));
                 } catch (e) {
                     Log.Write(e, "red");
 

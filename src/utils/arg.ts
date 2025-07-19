@@ -31,7 +31,7 @@ export namespace Args {
         max?: number;
         min?: number;
         isInteger?: boolean;
-        choices?: Record<number, number>;
+        choices?: Record<string, number>;
     };
 
     export interface ArgsItemBoolean extends BaseItem<"boolean"> {

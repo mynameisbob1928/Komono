@@ -67,21 +67,11 @@ export type SlashItem =
 
 export type SlashResolvedItem<T extends SlashItem> = 
     T extends SlashItemRole ? Role
-
-  : T extends SlashItemUser ? T["isMember"] extends true
-    ? GuildMember : User
-
-  : T extends SlashItemString ?
-    T["choices"] extends Record<string, string> ? { target: keyof T["choices"], value: string; } : string
-  : T extends SlashItemNumber ?
-    T["choices"] extends Record<string, number> ? { target: keyof T["choices"], value: number; } : number
-
+  : T extends SlashItemUser ? T["isMember"] extends true ? GuildMember : User
+  : T extends SlashItemString ? T["choices"] extends Record<string, string> ? { target: keyof T["choices"], value: string; } : string
+  : T extends SlashItemNumber ? T["choices"] extends Record<string, number> ? { target: keyof T["choices"], value: number; } : number
   : T extends SlashItemBoolean ? boolean
-
-  : T extends SlashItemChannel ? T["channelType"] extends Array<keyof typeof ChannelType>
-    ? (typeof ChannelType)[T["channelType"][number]]
-    : (typeof ChannelType)[ChannelType]
-
+  : T extends SlashItemChannel ? T["channelType"] extends Array<keyof typeof ChannelType> ? (typeof ChannelType)[T["channelType"][number]]: (typeof ChannelType)[ChannelType]
   : T extends SlashItemGroup ? { [K in keyof T["body"]]: SlashResolvedItem<T["body"][K]> }
   : T extends SlashItemCommand ?{ [K in keyof T["body"]]: SlashResolvedItem<T["body"][K]> }
   : never;
@@ -91,14 +81,14 @@ export interface SlashProps<T extends Record<string, SlashItem>> {
     description: SlashLocalization;
     integrations: Integrations[];
     contexts: Contexts[];
-    body: T;
+    args: T;
     cooldown: number;
     permissions: CommandPermission;
     nsfw: boolean;
     dev: boolean;
     defer: boolean;
     ephemeral: boolean;
-    run(interaction: ChatInputCommandInteraction, options: { [K in keyof T]: SlashResolvedItem<T[K]> }): any;
+    run(interaction: ChatInputCommandInteraction, args: { [K in keyof T]: SlashResolvedItem<T[K]> }): any;
     autocomplete(interaction: AutocompleteInteraction): any;
 };
 
@@ -107,7 +97,7 @@ export default class Slash<T extends Record<string, SlashItem>> {
   public description;
   public integrations;
   public contexts;
-  public body;
+  public args;
   public cooldown;
   public permissions;
   public nsfw;
@@ -143,8 +133,8 @@ export default class Slash<T extends Record<string, SlashItem>> {
       };
     };
 
-    for (const name in props.body) {
-      const body = props.body[name];
+    for (const name in props.args) {
+      const body = props.args[name];
       if (!body) continue;
 
       this.Parse(base, { body });
@@ -335,7 +325,7 @@ export default class Slash<T extends Record<string, SlashItem>> {
     this.description = props.description;
     this.integrations = props.integrations;
     this.contexts = props.contexts;
-    this.body = props.body;
+    this.args = props.args;
     this.cooldown = props.cooldown;
     this.permissions = props.permissions;
     this.nsfw = !!props.nsfw;
