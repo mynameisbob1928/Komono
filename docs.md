@@ -253,4 +253,4 @@ titanium/
 
 ## ❓ Questions?
 
-Open an issue or join our support Discord! 
+Open an issue or join our [support Discord](https://discord.gg/7b234YFhmn)! 
