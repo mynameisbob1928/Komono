@@ -28,12 +28,12 @@ files: [
       # Source files filter
       # e.g. "/resources/en/*.json"
       #
-      'source': 'src/locales/en-US/en-US.json',
+      'source': '/en-US/en-US.json',
 
       #
       # Translation files filter
       # e.g. "/resources/%two_letters_code%/%original_file_name%"
       #
-      'translation': 'src/locales/%locale%/%locale%.json',
+      'translation': /%locale%/%locale%.json',
     },
   ]
