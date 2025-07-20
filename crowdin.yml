@@ -16,7 +16,7 @@
 # Defines whether to preserve the original directory structure in the Crowdin project
 # Recommended to set to true
 #
-'preserve_hierarchy': false
+'preserve_hierarchy': true
 
 #
 # Files configuration.
