@@ -1,6 +1,7 @@
 import Slash from "bases/slash";
 import Prisma from "libs/database";
 import { Routes } from "discord.js";
+import { Translate } from "libs/locales";
 
 export default new Slash({
     name: "ping",
@@ -11,6 +12,8 @@ export default new Slash({
     args: {},
     defer: true,
     async run(interaction, args) {
+        const l = interaction.locale;
+
         // REST
         const restStart = performance.now();
         await interaction.client.rest.get(Routes.user("@me"));
@@ -24,6 +27,6 @@ export default new Slash({
         // WS
         const wsLatency = interaction.client.ws.ping;
 
-        await interaction.editReply(`Pong!\n-# Gateway (Shard ${interaction.guild?.shardId ?? "N/A"}): **${wsLatency}ms** ・ REST: **${restLatency}ms** ・ Database: **${databaseLatency}ms**`);
+        await interaction.editReply(Translate(l, "pong", [restLatency, databaseLatency, wsLatency]));
     }
 });

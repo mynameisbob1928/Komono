@@ -8,6 +8,7 @@ import { Codeblock, Highlight, Link } from "../../utils/markdown";
 import { Cooldown } from "../../utils/cooldown";
 import { Component } from "../../utils/component";
 import { Container } from "../../utils/container";
+import { Translate } from "libs/locales";
 
 export default new Event({
     name: "interactions",
@@ -16,6 +17,7 @@ export default new Event({
         switch (interaction.type) {
             case InteractionType.ApplicationCommand: {
                 if (!interaction.isChatInputCommand()) return;
+                const l = interaction.locale;
 
                 const command = interaction.client.slashes.find((slash: SlashType) => slash.name === interaction.commandName) as SlashType;
                 if (!command) return;
@@ -27,17 +29,17 @@ export default new Event({
                 if (interaction.inCachedGuild()) {
                     const permissions = command.permissions;
 
-                    if (permissions.author.length && permissions.author.every((p) => interaction.member.permissions.has(p))) {
+                    if (permissions.author.length && !permissions.author.every((p) => interaction.member.permissions.has(p))) {
                         await interaction.reply({
-                            content: `You're missing the following permissions: ${Highlight(permissions.author.map((perm) => perm).join(', '))}`,
+                            content: Translate(l, "authorMissingPerms", [Highlight(permissions.author.map((perm) => perm).join(', '))]),
                             flags: MessageFlags.Ephemeral
                         });
                         return;
                     };
 
-                    if (permissions.client.length && permissions.client.every((p) => interaction.guild.members.me?.permissions.has(p))) {
+                    if (permissions.client.length && !permissions.client.every((p) => interaction.guild.members.me?.permissions.has(p))) {
                         await interaction.reply({
-                            content: `I'm missing the following permissions: ${Highlight(permissions.client.map((perm) => perm).join(', '))}`,
+                            content: Translate(l, "clientMissingPerms", [Highlight(permissions.client.map((perm) => perm).join(', '))]),
                             flags: MessageFlags.Ephemeral
                         });
                         return;
@@ -66,7 +68,7 @@ export default new Event({
 
                     const text = Component.Create({
                         type: "textDisplay",
-                        content: `Something went wrong while attempting to run this command.\n${Codeblock("ansi", (e as Error).message)}\n-# Contact support ${Link("https://discord.gg/7b234YFhmn", "here")}`
+                        content: Translate(l, "commandExecutionError", [Codeblock("ansi", (e as Error).message), Link("https://discord.gg/7b234YFhmn", Translate(l, "aqui"))])
                     });
 
                     const container = Container.Create({ components: [text] });

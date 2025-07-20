@@ -1,3 +1,17 @@
 {
-  "pong": "Pong!\n-# Gateway (Shard {{0}}): **{{1}}** ・ REST: **{{2}}** ・ Banco de Dados: **{{3}}**"
+  "authorMissingPerms": "Você não possui as seguintes permissões: {{0}}",
+  "clientMissingPerms": "Eu não possuo as seguintes permissões: {{0}}",
+  "commandExecutionError": "Algo deu errado ao tentar executar o comando\n{{0}}\n-# Entre em contato com o suporte {{1}}",
+  "here": "aqui",
+  "pong": "Pong!\n-# Gateway (Shard {{0}}): **{{1}}** ・ REST: **{{2}}** ・ Banco de Dados: **{{3}}**",
+  "display": "Exibição",
+  "created": "Criado",
+  "joined": "Entrou",
+  "scores": "Pontuação",
+  "meaning": "O que ela significa?",
+  "details": "Verifique os detalhes da detecção",
+  "flagged": "{{0}} foi flagrado como\n{{1}}",
+  "textChannelError": "Esse comando só pode ser usado em canais de texto",
+  "noContentError": "Nenhuma mensagem foi encontrada com o conteudo especificado",
+  "bulkDeleteSuccess": "{{0}} Mensagens foram deletadas com sucesso"
 }

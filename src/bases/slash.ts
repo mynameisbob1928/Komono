@@ -1,5 +1,6 @@
 import { GuildMember, Role, SlashCommandBuilder, User, type LocalizationMap, ChannelType, ChatInputCommandInteraction, Locale, AutocompleteInteraction, type CacheType, ApplicationIntegrationType, InteractionContextType } from "discord.js";
 import type { allowedChannelTypes, CommandPermission, Optional } from "types/types";
+import { Log } from "utils/log";
 
 export type SlashType = "command" | "channel" | "boolean" | "string" | "number" | "option" | "group" | "user" | "role";
 export type SlashLocalization = (Partial<Record<keyof LocalizationMap, string>> & { global: string; }) | string;
@@ -133,18 +134,13 @@ export default class Slash<T extends Record<string, SlashItem>> {
       };
     };
 
-    for (const name in props.args) {
-      const body = props.args[name];
-      if (!body) continue;
-
-      this.Parse(base, { body });
-    };
+    this.Parse(base, props.args);
 
     return base;
   };
 
-  public static Parse<T extends Record<string, SlashItem>>(base: SlashCommandBuilder, props: T) {
-    for (const [key, option] of Object.entries(props)) {
+    public static Parse<T extends Record<string, SlashItem>>(base: SlashCommandBuilder, props: T) {
+      for (const [key, option] of Object.entries(props)) {
       const name = key;
       const description = typeof option.description === "string"
         ? option.description
@@ -170,12 +166,7 @@ export default class Slash<T extends Record<string, SlashItem>> {
 
       if (option.type == "command" || option.type == "group") {
         base[option.type === "command" ? "addSubcommand" : "addSubcommandGroup"]((base: any) => {
-          for (const name in option.body) {
-            const body = option.body[name];
-            if (!body) continue;
-
-            this.Parse(base as any, { body });
-          };
+         this.Parse(base, props.args || {});
 
           return Localize(base.setName(option.name).setDescription(option.description));
         });
@@ -268,10 +259,10 @@ export default class Slash<T extends Record<string, SlashItem>> {
     return base;
   };
 
-  public static Resolve<T extends Record<string, SlashItem>>(interaction: ChatInputCommandInteraction<CacheType>, body: T): { [K in keyof T]: SlashResolvedItem<T[K]> } {
+  public static Resolve<T extends Record<string, SlashItem>>(interaction: ChatInputCommandInteraction<CacheType>, props: T): { [K in keyof T]: SlashResolvedItem<T[K]> } {
     const result: Partial<{ [K in keyof T]: SlashResolvedItem<T[K]> }> = {};
 
-    for (const [key, option] of Object.entries(body) as [keyof T, SlashItem][]) {
+    for (const [key, option] of Object.entries(props) as [keyof T, SlashItem][]) {
       switch (option.type) {
         case "boolean": {
           result[key] = interaction.options.getBoolean(key as string, (option as any).required) as any;
@@ -325,7 +316,7 @@ export default class Slash<T extends Record<string, SlashItem>> {
     this.description = props.description;
     this.integrations = props.integrations;
     this.contexts = props.contexts;
-    this.args = props.args;
+    this.args = props.args || {};
     this.cooldown = props.cooldown;
     this.permissions = props.permissions;
     this.nsfw = !!props.nsfw;

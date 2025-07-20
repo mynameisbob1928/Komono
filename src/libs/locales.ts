@@ -5,7 +5,7 @@ const path = join(__dirname, '../locales');
 const fallback = "en";
 const supportedLanguages = ["en-US", "pt-BR"];
 
-export function Translate(key: string, lang: string, params: (string | number)[] = []): string {
+export function Translate(lang: string, key: string, params: (string | number)[] = []): string {
     const shortLang = lang.split('-')[0] || fallback;
     const finalLang = supportedLanguages.includes(shortLang) ? shortLang : fallback;
 
