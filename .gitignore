@@ -175,7 +175,3 @@ dist
 .DS_Store
 
 /generated/prisma
-
-# Crowdin YML
-
-crowdin.yml
