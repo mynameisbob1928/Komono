@@ -1,81 +1,54 @@
-# Komono Bot Documentation
+# Komono Bot
 
-## Overview
-
-Komono is a modular Discord bot written in TypeScript, supporting prefix and slash commands, events, interactive components, internationalization, logging, and hot reload.
-
-> **Note:** Mermaid diagrams are not rendered on GitHub. They will appear as code blocks.
-
-```
-mermaid
-flowchart TD
-    A[User] -->|Message/Interaction| B(Client)
-    B --> C{Handler}
-    C -->|Prefix Commands| D[Prefix]
-    C -->|Slash Commands| E[Slash]
-    C -->|Events| F[Event]
-    C -->|Components| G[Component]
-    D --> H[Run]
-    E --> H
-    F --> H
-    G --> H
-```
+> **Komono** is a modular Discord bot written in TypeScript, supporting prefix and slash commands, events, interactive components, internationalization, logging, and hot reload.
 
 ---
 
-## Installation
+## 🚀 Quick Start
 
-1. **Prerequisites:**
-   - Node.js or Bun
+1. **Prerequisites**
+   - Node.js **or** Bun
    - Database (Prisma)
-   - Redis (optional, only if you want to use cache)
 
-2. **Clone the project:**
+2. **Clone the project**
+   ```sh
+   git clone <repo-url>
+   cd titanium
+   ```
 
-```
-git clone <repo-url>
-cd titanium
-```
+3. **Install dependencies**
+   ```sh
+   bun install
+   # or
+   npm install
+   ```
 
-3. **Install dependencies:**
+4. **Configure environment**
+   - Create a `.env` file in the root:
+     ```
+     token:your_discord_token
+     dev:["123456789", "987654321"]
+     # lastfm:your_lastfm_api_key
+     # DATABASE_URL=your_database_url
+     # ... (add other fields as needed)
+     ```
+   - **Note:** Use `:` (colon) to separate key and value.
 
-```
-bun install
-# or
-npm install
-```
+5. **Run Prisma migrations**
+   ```sh
+   npx prisma migrate deploy
+   ```
 
-4. **Configure environment variables:**
-   Create a `.env` file with:
-
-```
-token:your_discord_token
-dev:["123456789", "987654321"]
-# Add other fields from env.example below:
-# lastfm:your_lastfm_api_key
-# DATABASE_URL=your_database_url
-# ... (add all fields present in your env.example)
-```
-
-- For the `dev` variable, use a JSON array of strings (with quotes), e.g. `["123456789", "987654321"]`.
-
-5. **Run Prisma migrations:**
-
-```
-npx prisma migrate deploy
-```
-
-6. **Start the bot:**
-
-```
-bun run src/client/manager.ts
-# or
-npm run start
-```
+6. **Start the bot**
+   ```sh
+   bun run src/client/manager.ts
+   # or
+   npm run start
+   ```
 
 ---
 
-## Folder Structure
+## 📁 Folder Structure
 
 ```
 titanium/
@@ -90,351 +63,194 @@ titanium/
 
 ---
 
-## Database (Prisma)
+## ⚙️ Environment Variables
 
-- All database access is handled via [Prisma](https://www.prisma.io/).
-- The Prisma client is exported from `src/libs/database.ts` and can be used anywhere in your code:
-
-```ts
-import Prisma from "libs/database";
-// Example: Fetch user data
-const user = await Prisma.user.findUnique({ where: { id: userId } });
-```
-
-- To add new models or fields, edit `prisma/schema.prisma` and run migrations:
-
-```
-npx prisma migrate dev --name <migration-name>
-```
-
-- For advanced usage, see the [Prisma docs](https://www.prisma.io/docs/).
+- The custom loader reads `.env` in the format `key:value` (do not use `=`!).
+- Example:
+  ```
+  token:your_token
+  dev:["123456789", "987654321"]
+  ```
+- For arrays, use JSON: `["id1", "id2"]`
+- Only add Redis variables if you want cache: `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
 
 ---
 
-## Environment Variables
+## 🗄️ Database (Prisma)
 
-- The bot uses a custom environment loader (`src/libs/env.ts`).
-- Use `Env.Required("key")` to access variables. Example:
-
-```ts
-import { Env } from "libs/env";
-const token = Env.Required("token").ToString();
-const devs = Env.Required("dev").ToArray();
-```
-
-- The `.env` file should be in the project root. Each line is `KEY:VALUE` (colon, not equals!). Example:
-
-```
-token:your_token_here
-dev:["123456789", "987654321"]
-```
-
-- For the `dev` variable, use a JSON array of strings (with quotes), e.g. `["123456789", "987654321"]`.
-- Only add Redis variables (`REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`) if you plan to use Redis-based cache.
-- If a required variable is missing, the bot will throw an error at startup.
+- The Prisma client is exported from `src/libs/database.ts`:
+  ```ts
+  import Prisma from "libs/database";
+  const user = await Prisma.user.findUnique({ where: { id: userId } });
+  ```
+- To add new models/fields, edit `prisma/schema.prisma` and run:
+  ```sh
+  npx prisma migrate dev --name <migration-name>
+  ```
 
 ---
 
-## Handler & Hot Reload
+## 🌐 Internationalization
 
-- The `Handler` (`src/utils/handler.ts`) is responsible for loading and reloading commands, events, and components.
-- It supports hot reload: when you save a file, the bot reloads only the affected module.
-- Example usage:
-
-```ts
-import { Handler } from "utils/handler";
-await Handler.Initialize(client, {
-  events: "src/client/events",
-  slashes: "src/client/commands/slashes",
-  prefixes: "src/client/commands/prefixes",
-  components: "src/client/components"
-});
-```
-
-- The system uses dynamic imports and clears the require cache for each file.
-- You can trigger reloads manually or rely on the built-in watcher.
+- Translations are in `src/locales/<lang>/<lang>.json` (e.g., `en-US/en-US.json`)
+- To add a language:
+  1. Copy an existing folder and translate the JSON.
+  2. Add the language code to the `supportedLanguages` array in `src/libs/locales.ts`.
+- To use:
+  ```ts
+  import { Translate } from "libs/locales";
+  const msg = Translate("en-US", "ping:response", [1,2,3]);
+  ```
 
 ---
 
-## Folder Watcher
+## 🧩 Prefix Commands
 
-- The custom `FolderWatcher` (`src/utils/watcher.ts`) recursively watches directories for changes.
-- It is used to trigger hot reloads for commands, events, and components.
-- Example usage:
-
-```ts
-import FolderWatcher from "utils/watcher";
-const watcher = new FolderWatcher("src/client", true);
-watcher.onChange = (filePath) => {
-  // Handle file change
-};
-```
-
-- The watcher supports add, change, and remove events.
-- Useful for development and debugging.
+- Location: `src/client/commands/prefixes/`
+- Base: `src/bases/prefix.ts`
+- Example:
+  ```ts
+  import Prefix from "bases/prefix";
+  export default new Prefix({
+    name: "ping",
+    description: "Responds with Pong!",
+    async run(client, message, args) {
+      await message.reply("Pong!");
+    }
+  });
+  ```
+- Permissions:
+  ```ts
+  permissions: { author: ["ManageGuild"], client: [] }
+  ```
+- Cooldown:
+  ```ts
+  cooldown: 5 // seconds
+  ```
+- Args:
+  ```ts
+  args: {
+    user: { type: "user", description: "user to view", required: false }
+  }
+  ```
 
 ---
 
-## Advanced Utilities
+## 📝 Slash Commands
 
-- **ANSI Colors for Logging and Messages** (`src/utils/ansi.ts`):
-  - The `Ansi` utility provides color formatting for terminal output and can also be used in Discord messages (where supported, e.g., codeblocks with ANSI highlighting).
-  - It is used internally by `Log.Write` to colorize logs in the terminal:
+- Location: `src/client/commands/slashes/`
+- Base: `src/bases/slash.ts`
+- Example:
+  ```ts
+  import Slash from "bases/slash";
+  export default new Slash({
+    name: "ping",
+    description: { global: "Check if the bot is alive", "pt-BR": "Verifica se o bot está vivo" },
+    integrations: ["guild", "user"],
+    contexts: ["guild", "bot", "DM"],
+    cooldown: 3,
+    args: {},
+    defer: true,
+    async run(interaction, args) {
+      await interaction.editReply("Pong!");
+    }
+  });
+  ```
 
-    ```ts
-    import { Log } from "utils/log";
-    Log.Write("This is a green message", "green");
-    // Output: [timestamp] This is a green message (in green)
-    ```
+---
 
-  - You can also use `Ansi.Format` directly:
+## 🎉 Events
 
-    ```ts
-    import { Ansi } from "utils/ansi";
-    console.log(Ansi.Format("Hello World", "red"));
-    ```
+- Location: `src/client/events/`
+- Base: `src/bases/event.ts`
+- Example:
+  ```ts
+  import Event from "bases/event";
+  export default new Event({
+    name: "ready",
+    type: "ready",
+    once: true,
+    run(client) {
+      console.log(`Bot online as ${client.user.tag}`);
+    }
+  });
+  ```
 
-  - **In Discord messages:**
-    - You can use ANSI formatting in codeblocks for supported Discord clients:
+---
 
-      ```ts
-      import { Ansi } from "utils/ansi";
-      const ansiMsg = Ansi.Format("Error!", "red");
-      await message.reply(````ansi\n${ansiMsg}\n```);
-      ```
+## 🖲️ Interactive Components
 
-    - This will render colored text in Discord clients that support ANSI in codeblocks.
-  - **Available colors:** `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `black`, and their aliases (e.g., `r` for red).
+- Location: `src/client/components/`
+- Base: `src/bases/component.ts`
+- Example:
+  ```ts
+  import Component from "bases/component";
+  export default new Component({
+    id: "myButton",
+    type: "button",
+    async run(interaction, args) {
+      await interaction.reply("You clicked!");
+    }
+  });
+  ```
 
-- **Embed Builder** (`src/utils/embed.ts`):
+---
 
+## 🛠️ Utilities
+
+- **ANSI for logs and messages**
+  ```ts
+  import { Ansi } from "utils/ansi";
+  console.log(Ansi.Format("Hello World", "red"));
+  ```
+  - Colors: `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `black` (and aliases: `r`, `g`, etc.)
+
+- **Embed Builder**
   ```ts
   import { Embed } from "utils/embed";
   const embed = Embed.Create({
     title: "Hello!",
-    description: "This is an embed.",
+    description: "Embed message",
     color: "Blue"
   });
   ```
 
-- **Markdown Helpers** (`src/utils/markdown.ts`):
-  - Format codeblocks, highlights, icons, links, etc.
-  - Example:
+- **Markdown Helpers**
+  ```ts
+  import { Codeblock, Highlight, Icon, Link } from "utils/markdown";
+  const msg = `${Icon("Info")} ${Highlight("Important!")}`;
+  ```
 
-    ```ts
-    import { Codeblock, Highlight, Icon, Link } from "utils/markdown";
-    const msg = `${Icon("Info")} ${Highlight("Important!")}`;
-    ```
+- **Cooldown**
+  ```ts
+  import { Cooldown } from "utils/cooldown";
+  Cooldown.Check(client, userId, commandName, cooldownSeconds);
+  ```
 
-- **Request Utility** (`src/libs/request.ts`):
-  - Helper for HTTP requests (fetch wrapper).
-- **Component/Container Helpers** (`src/utils/component.ts`, `src/utils/container.ts`):
-  - Build Discord message components and containers easily.
-
----
-
-## Sharding & Cluster
-
-- The bot uses [status-sharding](https://www.npmjs.com/package/status-sharding) for clustering and sharding.
-- Entrypoint: `src/client/manager.ts`.
-- Example:
-
-```ts
-import { ClusterManager } from "status-sharding";
-const manager = new ClusterManager("src/client/app.ts", {
-  mode: "process",
-  token: Env.Required("token").ToString(),
-  respawn: true,
-  // ...other options
-});
-```
-
-- This allows the bot to scale across multiple processes/servers.
-- For most users, the default config is enough. For advanced setups, see the [status-sharding docs](https://www.npmjs.com/package/status-sharding).
+- **Logging**
+  ```ts
+  import { Log } from "utils/log";
+  Log.Write("Message", "green");
+  ```
 
 ---
 
-## Localization / Translations
+## ♻️ Hot Reload
 
-- All user-facing strings are localized.
-- Translation files are in `src/locales/<lang>/<lang>.json` (e.g., `en-US/en-US.json`).
-- To add a new language:
-  1. Copy an existing folder (e.g., `en-US`) and translate the JSON.
-  2. Add the language code to the `supportedLanguages` array in `src/libs/locales.ts`.
-- To use a translation in code:
-
-```ts
-import { Translate } from "libs/locales";
-const msg = Translate("en-US", "ping:response", [1,2,3]);
-```
-
-- If a key is missing, an error is thrown at runtime.
+- The bot automatically reloads commands, events, and components when files are saved.
+- The system uses the `Handler` (`src/utils/handler.ts`) and the custom watcher (`src/utils/watcher.ts`).
 
 ---
 
-## Prefix Commands
-
-- Location: `src/client/commands/prefixes/`
-- Base: `src/bases/prefix.ts`
-
-### Example:
-
-```ts
-import Prefix from "bases/prefix";
-
-export default new Prefix({
-  name: "ping",
-  description: "Responds with Pong!",
-  async run(client, message, args) {
-    await message.reply("Pong!");
-  }
-});
-```
-
-- **Permissions:**
-
-```ts
-permissions: { author: ["ManageGuild"], client: [] }
-```
-
-- **Cooldown:**
-
-```ts
-cooldown: 5 // seconds
-```
-
-- **Args:**
-
-```ts
-args: {
-  user: { type: "user", description: "user to view", required: false }
-}
-```
-
----
-
-## Slash Commands
-
-- Location: `src/client/commands/slashes/`
-- Base: `src/bases/slash.ts`
-
-### Example:
-
-```ts
-import Slash from "bases/slash";
-
-export default new Slash({
-  name: "ping",
-  description: { global: "Check if the bot is alive", "pt-BR": "Verifica se o bot está vivo" },
-  integrations: ["guild", "user"],
-  contexts: ["guild", "bot", "DM"],
-  cooldown: 3,
-  args: {},
-  defer: true,
-  async run(interaction, args) {
-    await interaction.editReply("Pong!");
-  }
-});
-```
-
-- **Internationalization:** Use objects for `name` and `description`.
-- **Autocomplete:** Add an `autocomplete(interaction)` method.
-
----
-
-## Events
-
-- Location: `src/client/events/`
-- Base: `src/bases/event.ts`
-
-### Example:
-
-```ts
-import Event from "bases/event";
-
-export default new Event({
-  name: "ready",
-  type: "ready",
-  once: true,
-  run(client) {
-    console.log(`Bot online as ${client.user.tag}`);
-  }
-});
-```
-
----
-
-## Interactive Components
-
-- Location: `src/client/components/`
-- Base: `src/bases/component.ts`
-
-### Example:
-
-```ts
-import Component from "bases/component";
-
-export default new Component({
-  id: "myButton",
-  type: "button",
-  async run(interaction, args) {
-    await interaction.reply("You clicked!");
-  }
-});
-```
-
----
-
-## Utilities
-
-- **Cooldown:** `src/utils/cooldown.ts`
-
-```ts
-import { Cooldown } from "utils/cooldown";
-Cooldown.Check(client, userId, commandName, cooldownSeconds);
-```
-
-- **Internationalization:** `src/libs/locales.ts`
-
-```ts
-import { Translate } from "libs/locales";
-Translate("en-US", "ping:response", [1,2,3]);
-```
-
-- **Logging:** `src/utils/log.ts`
-
-```ts
-import { Log } from "utils/log";
-Log.Write("Message", "green");
-```
-
----
-
-## Hot Reload
-
-The bot supports automatic hot reload of commands, events, and components when files are saved.
-
----
-
-## Best Practices
-
-- Use clear names for commands, events, and components.
-- Always define permissions and cooldowns.
-- Use internationalization for all messages.
-- Prefer async/await.
-- Document complex commands with comments.
-
----
-
-## Contributing
+## 🧑‍💻 Contributing
 
 1. Follow the folder and naming conventions.
 2. Always test commands before pushing.
 3. Open PRs with clear descriptions.
-4. Use comments to explain complex logic.
+4. Comment complex logic.
 
 ---
 
-## Questions?
+## ❓ Questions?
 
 Open an issue or join our support Discord! 
