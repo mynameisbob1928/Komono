@@ -19,10 +19,10 @@ export default new Event({
                 if (!interaction.isChatInputCommand()) return;
                 const l = interaction.locale;
 
-                const command = interaction.client.slashes.find((slash: SlashType) => slash.name === interaction.commandName) as SlashType;
+                const command = interaction.client.slashes.find((slash: SlashType) => ((slash.name as any).global ?? slash.name) === interaction.commandName) as SlashType;
                 if (!command) return;
 
-                Log.Write(`Received slash command interaction: ${command.name}`, "green");
+                Log.Write(`Received slash command interaction: ${(command.name as any).global ?? command.name}`, "green");
 
                 const dev = Env.Required("dev").ToArray();
 

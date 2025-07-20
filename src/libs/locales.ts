@@ -1,15 +1,13 @@
-import { join } from 'path';
+import path from "path";
 import fs from 'fs';
 
-const path = join(__dirname, '../locales');
-const fallback = "en";
+const dir = path.join(__dirname, '../locales');
+const fallback = "en-US";
 const supportedLanguages = ["en-US", "pt-BR"];
 
 export function Translate(lang: string, key: string, params: (string | number)[] = []): string {
-    const shortLang = lang.split('-')[0] || fallback;
-    const finalLang = supportedLanguages.includes(shortLang) ? shortLang : fallback;
-
-    const filePath = `${path}/${finalLang}/${finalLang}.json`;
+    const finalLang = supportedLanguages.includes(lang) ? lang : fallback;
+    const filePath = path.join(dir, finalLang, `${finalLang}.json`);
 
     if (!fs.existsSync(filePath)) {
         throw new Error(`Translation file not found in ${filePath}`);

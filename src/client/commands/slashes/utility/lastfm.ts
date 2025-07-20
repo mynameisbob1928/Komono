@@ -72,19 +72,19 @@ export default new Slash({
 
         const username = data.username;
 
-        const recentTracks = await Request.Request({
+        const trackRes = await Request.Request({
             url: `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${encodeURIComponent(username)}&api_key=${key}&format=json&limit=1`,
             method: "GET",
             response: "JSON"
         });
 
-        const userInfo = await Request.Request({
+        const userRes = await Request.Request({
             url: `https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${encodeURIComponent(username)}&api_key=${key}&format=json&limit=1`,
             method: "GET",
             response: "JSON"
         });
 
-        if (!userInfo) {
+        if (!userRes) {
             const text = Component.Create({
                 type: "textDisplay",
                 content: `${Icon("Error")} ${Translate(l, "lastfm:userNotFound", [username])}`
@@ -96,8 +96,8 @@ export default new Slash({
             return;
         };
 
-        const track = recentTracks.recentTracks.track[0];
-        if (!track) {
+        const tracks = trackRes.recentTracks.track;
+        if (!tracks) {
             const text = Component.Create({
                 type: "textDisplay",
                 content: `${Icon("Error")} ${Translate(l, "lastfm:noTracks")}`
@@ -108,6 +108,8 @@ export default new Slash({
             await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
             return;
         };
+
+        const track = tracks[0];
 
         const playing = track["@attr"]?.nowplaying === "true";
         if (!playing) {
