@@ -1,10 +1,11 @@
-import { ChannelType, type PermissionResolvable } from "discord.js";
+import { ChannelType, type ClientEvents, type PermissionResolvable } from "discord.js";
 import type { SlashItem } from "../bases/slash";
 import type Slash from "../bases/slash";
 import type Prefix from "../bases/prefix";
 import type Event from "../bases/event";
 import type { ComponentCategory } from "../bases/component";
 import type Component from "../bases/component";
+import type { Args } from "utils/arg";
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -32,7 +33,7 @@ export interface CommandPermission {
   client: PermissionResolvable[];
 };
 
-export type EventType = InstanceType<typeof Event> & { path: string };
+export type EventType<T extends keyof ClientEvents = any> = InstanceType<typeof Event<T>> & { path: string };
 export type SlashType<T extends Record<string, SlashItem> = any> = InstanceType<typeof Slash<T>> & { path: string };
-export type PrefixType = InstanceType<typeof Prefix> & { path: string };
+export type PrefixType<T extends Record<string, Args.ArgsItems> = any> = InstanceType<typeof Prefix<T>> & { path: string };
 export type ComponentType<T extends ComponentCategory = any> = InstanceType<typeof Component<T>> & { path: string };

@@ -21,8 +21,14 @@ export default new Slash({
     args: {
         user: {
             type: "user",
-            name: "user",
-            description: "The user to view info"
+            name: {
+                global: "user",
+                "pt-BR": "usuário"
+            },
+            description: {
+                global: "The user to view info",
+                "pt-BR": "O usuário para ver o perfil"
+            },
         }
     },
     defer: true,

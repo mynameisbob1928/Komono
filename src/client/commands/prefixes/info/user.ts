@@ -13,8 +13,8 @@ export default new Prefix({
     args: {
         user: {
             type: "user",
-            name: "user",
-            description: "The user to view info"
+            description: "The user to view info",
+            foo: "bar"
         }
     },
     async run(client, message, args) {
