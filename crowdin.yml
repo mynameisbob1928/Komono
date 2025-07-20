@@ -34,6 +34,6 @@ files: [
       # Translation files filter
       # e.g. "/resources/%two_letters_code%/%original_file_name%"
       #
-      'translation': /%locale%/%original_file_name%.json',
+      'translation': /%locale%/%original_file_name%',
     },
   ]
