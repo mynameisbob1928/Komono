@@ -7,21 +7,33 @@ import { Icon, Link } from "utils/markdown";
 import { Container } from "utils/container";
 import { Request } from "libs/request";
 import { Commas } from "utils/utils";
+import { Translate } from "libs/locales";
 
 export default new Slash({
     name: "lastfm",
-    description: "Show the music that you're listening to",
+    description: {
+        global: "Show the music that you're listening to",
+        "pt-BR": "Mostra a música que você está escutando"
+    },
     integrations: ["guild", "user"],
     contexts: ["guild", "bot", "DM"],
     cooldown: 5,
     args: {
         user: {
             type: "string",
-            name: "user",
-            description: "Lastfm account username"
+            name: {
+                global: "user",
+                "pt-BR": "usuário"
+            },
+            description: {
+                global: "Lastfm account username",
+                "pt-BR": "Nome da conta Lastfm"
+            }
         }
     },
     async run(interaction, args) {
+        const l = interaction.locale;
+
         const userId = interaction.user.id;
         const key = Env.Required("lastfm").ToString();
 
@@ -36,7 +48,7 @@ export default new Slash({
 
             const text = Component.Create({
                 type: "textDisplay",
-                content: `${Icon("Sucess")} Last.fm username saved as **${username}**!`
+                content: `${Icon("Sucess")} ${Translate(l, "lastfm:userSaved", [username])}`
             });
 
             const container = Container.Create({ components: [text] });
@@ -49,7 +61,7 @@ export default new Slash({
         if (!data) {
             const text = Component.Create({
                 type: "textDisplay",
-                content: `${Icon("Error")} You need to set your Last.fm username first with the command, e.g., k.lastfm <username>`
+                content: `${Icon("Error")} ${Translate(l, "lastfm:noData")}`
             });
 
             const container = Container.Create({ components: [text] });
@@ -75,7 +87,7 @@ export default new Slash({
         if (!userInfo) {
             const text = Component.Create({
                 type: "textDisplay",
-                content: `${Icon("Error")} Username "${username}" is invalid. Please update it using the command k.lastfm <username>`
+                content: `${Icon("Error")} ${Translate(l, "lastfm:userNotFound", [username])}`
             });
 
             const container = Container.Create({ components: [text] });
@@ -88,7 +100,7 @@ export default new Slash({
         if (!track) {
             const text = Component.Create({
                 type: "textDisplay",
-                content: `${Icon("Error")} No recent tracks found`
+                content: `${Icon("Error")} ${Translate(l, "lastfm:noTracks")}`
             });
 
             const container = Container.Create({ components: [text] });
@@ -101,7 +113,7 @@ export default new Slash({
         if (!playing) {
             const text = Component.Create({
                 type: "textDisplay",
-                content: `${Icon("Error")} No track playing right now`
+                content: `${Icon("Error")} ${Translate(l, "lastfm:noTrackPlaying")}`
             });
 
             const container = Container.Create({ components: [text] });
@@ -121,7 +133,7 @@ export default new Slash({
 
         const text1 = Component.Create({
             type: "textDisplay",
-            content: `${interaction.user} is playing ${Link(track.url, track.name)} by ${track.artist["#text"]}`
+            content: Translate(l, "lastfm:trackPlaying", [interaction.user.id, Link(track.url, track.name), track.artist["#text"]])
         });
 
         const text2 =  Component.Create({
@@ -131,7 +143,7 @@ export default new Slash({
 
         const text3 = Component.Create({
             type: "textDisplay",
-            content: `Album: ${track.album["#text"] ? `**${track.album["#text"]}**` : "**Album not found**"} ・ Scrobbles: **${Commas(userInfo.user.playcount) || "N/A"}**`
+            content: Translate(l, "lastfm:albumAndScrobbles", [track.album?.["#text"] ?? Translate(l, "lastfm:albumNotFound")])
         });
 
         let content;

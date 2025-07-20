@@ -5,7 +5,10 @@ import { Translate } from "libs/locales";
 
 export default new Slash({
     name: "ping",
-    description: "Check if the bot is alive",
+    description: {
+        global: "Check if the bot is alive",
+        "pt-BR": "Verifica se o bot está vivo",
+    },
     cooldown: 3,
     integrations: ["guild", "user"],
     contexts: ["guild", "bot", "DM"],
@@ -27,6 +30,6 @@ export default new Slash({
         // WS
         const wsLatency = interaction.client.ws.ping;
 
-        await interaction.editReply(Translate(l, "pong", [restLatency, databaseLatency, wsLatency]));
+        await interaction.editReply(Translate(l, "ping:response", [restLatency, databaseLatency, wsLatency]));
     }
 });

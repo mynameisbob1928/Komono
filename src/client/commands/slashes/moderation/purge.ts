@@ -3,12 +3,17 @@ import { MessageFlags } from "discord.js";
 import { Translate } from "libs/locales";
 import { Component } from "utils/component";
 import { Container } from "utils/container";
-import { Log } from "utils/log";
 import { Highlight, Icon } from "utils/markdown";
 
 export default new Slash({
-    name: "purge",
-    description: "Delete messages in the current channel",
+    name: {
+        global: "purge",
+        "pt-BR": "limpar"
+    },
+    description: {
+        global: "Delete messages in the current channel",
+        "pt-BR": "Deleta mensagens no canal atual"
+    },
     integrations: ["guild"],
     contexts: ["guild"],
     cooldown: 5,
@@ -19,8 +24,14 @@ export default new Slash({
     args: {
         amount: {
             type: "number",
-            name: "amount",
-            description: "Number of messages to delete",
+            name: {
+                global: "amount",
+                "pt-BR": "quantidade"
+            },
+            description: {
+                global: "Number of messages to delete",
+                "pt-BR": "Número de mensagens para deletar"
+            },
             min: 1,
             max: 100,
             isInteger: true,
@@ -28,8 +39,14 @@ export default new Slash({
         },
         content: {
             type: "string",
-            name: "content",
-            description: "Message content to delete"
+            name: {
+                global: "content",
+                "pt-BR": "conteúdo"
+            },
+            description: {
+                global: "Message content to delete",
+                "pt-BR": "Conteúdo das mensagens para deletar"
+            }
         }
     },
     defer: true,
@@ -44,7 +61,7 @@ export default new Slash({
         if (!channel?.isTextBased()) {
             const text = Component.Create({
                 type: "textDisplay",
-                content: `${Icon("Error")} ${Translate(l, "channelTypeError")}`
+                content: `${Icon("Error")} ${Translate(l, "purge:channelTypeError")}`
             });
 
             const container = Container.Create({ components: [text] });
@@ -66,7 +83,7 @@ export default new Slash({
         if (filtered.size === 0) {
             const text = Component.Create({
                 type: "textDisplay",
-                content: `${Icon("Info")} ${Translate(l, "noContentError")}`
+                content: `${Icon("Info")} ${Translate(l, "purge:noContentError")}`
             });
 
             const container = Container.Create({ components: [text] });
@@ -79,7 +96,7 @@ export default new Slash({
 
         const text = Component.Create({
             type: "textDisplay",
-            content: `${Icon("Success")} ${Translate(l, "bulkDeleteSuccess", [filtered.size])}`
+            content: `${Icon("Success")} ${Translate(l, "purge:bulkDeleteSuccess", [Highlight(filtered.size)])}`
         });
 
         const container = Container.Create({ components: [text] });

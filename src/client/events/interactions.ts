@@ -31,7 +31,7 @@ export default new Event({
 
                     if (permissions.author.length && !permissions.author.every((p) => interaction.member.permissions.has(p))) {
                         await interaction.reply({
-                            content: Translate(l, "authorMissingPerms", [Highlight(permissions.author.map((perm) => perm).join(', '))]),
+                            content: Translate(l, "command:authorMissingPerms", [Highlight(permissions.author.map((perm) => perm).join(', '))]),
                             flags: MessageFlags.Ephemeral
                         });
                         return;
@@ -39,7 +39,7 @@ export default new Event({
 
                     if (permissions.client.length && !permissions.client.every((p) => interaction.guild.members.me?.permissions.has(p))) {
                         await interaction.reply({
-                            content: Translate(l, "clientMissingPerms", [Highlight(permissions.client.map((perm) => perm).join(', '))]),
+                            content: Translate(l, "command:clientMissingPerms", [Highlight(permissions.client.map((perm) => perm).join(', '))]),
                             flags: MessageFlags.Ephemeral
                         });
                         return;
@@ -68,7 +68,7 @@ export default new Event({
 
                     const text = Component.Create({
                         type: "textDisplay",
-                        content: Translate(l, "commandExecutionError", [Codeblock("ansi", (e as Error).message), Link("https://discord.gg/7b234YFhmn", Translate(l, "aqui"))])
+                        content: Translate(l, "command:errorExecution", [Codeblock("ansi", (e as Error).message), Link("https://discord.gg/7b234YFhmn", Translate(l, "command:supportLink"))])
                     });
 
                     const container = Container.Create({ components: [text] });

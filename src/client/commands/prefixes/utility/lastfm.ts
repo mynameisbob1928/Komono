@@ -130,7 +130,7 @@ export default new Prefix({
 
         const text3 = Component.Create({
             type: "textDisplay",
-            content: `Album: ${track.album["#text"] ? `**${track.album["#text"]}**` : "**Album not found**"} ・ Scrobbles: **${Commas(userInfo.user.playcount) || "N/A"}**`
+            content: `Album: **${track.album?.["#text"] ?? "Album not found"}** ・ Scrobbles: **${Commas(userInfo.user.playcount) || "N/A"}**`
         });
 
         let content;

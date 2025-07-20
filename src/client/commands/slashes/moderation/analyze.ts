@@ -9,16 +9,28 @@ import { Container } from "utils/container";
 import { Codeblock, Highlight, IconPill, Link } from "utils/markdown";
 
 export default new Slash({
-    name: "analyze",
-    description: "Analyze the given text using Google's Perspective API",
+    name: {
+        global: "analyze",
+        "pt-BR": "analisar"
+    },
+    description: {
+        global: "Analyze the given text using Google's Perspective API",
+        "pt-BR": "Analisa o texto fornecido usando a API Perspective do Google"
+    },
     integrations: ["guild", "user"],
     contexts: ["guild", "DM", "bot"],
     cooldown: 5,
     args: {
         message: {
             type: "string",
-            name: "message",
-            description: "Message to be analyzed",
+            name: {
+                global: "message",
+                "pt-BR": "mensagem"
+            },
+            description: {
+                global: "Message to be analyzed",
+                "pt-BR": "Mensagem a ser analisada"
+            },
             required: true
         }
     },
@@ -82,8 +94,8 @@ export default new Slash({
 
         const text = Component.Create({
             type: "textDisplay",
-            content: `${IconPill("Insights", Translate(l, "Scores"))} ${Link("https://developers.perspectiveapi.com/s/about-the-api-attributes-and-languages", Translate(l, "meaning"), Translate(l, "details"))}
-            \n${Translate(l, "flagged", [Highlight(msg), Codeblock("ansi", result.join("\n"))])}`
+            content: `${IconPill("Insights", Translate(l, "analyze:scores"))} ${Link("https://developers.perspectiveapi.com/s/about-the-api-attributes-and-languages", Translate(l, "analyze:meaning"), Translate(l, "analyze:details"))}
+            \n${Translate(l, "analyze:flagged", [Highlight(msg), Codeblock("ansi", result.join("\n"))])}`
         });
 
         const container = Container.Create({ components: [text] });

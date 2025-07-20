@@ -7,8 +7,14 @@ import { Container } from "utils/container";
 import { Icon, IconPill, Pill, SmallPill, Timestamp } from "utils/markdown";
 
 export default new Slash({
-    name: "user",
-    description: "View user profile",
+    name: {
+        global: "user",
+        "pt-BR": "usuário"
+    },
+    description: {
+        global: "View user profile",
+        "pt-BR": "Veja o perfil do usuário"
+    },
     integrations: ["guild", "user"],
     contexts: ["guild", "DM", "bot"],
     cooldown: 5,
@@ -108,19 +114,19 @@ export default new Slash({
 
         const text2 = Component.Create({
             type: "textDisplay",
-            content: `${IconPill("Member", Translate(l, "display"))}\n${SmallPill(member ? member.displayName : user.displayName )}`
+            content: `${IconPill("Member", Translate(l, "user:display"))}\n${SmallPill(member ? member.displayName : user.displayName )}`
         });
 
         const text3 = Component.Create({
             type: "textDisplay",
-            content: `${IconPill("Calendar", Translate(l, "created"))}\n${Timestamp(user.createdTimestamp, "D")}`
+            content: `${IconPill("Calendar", Translate(l, "user:created"))}\n${Timestamp(user.createdTimestamp, "D")}`
         });
 
         let text4;
         if (member) {
             text4 = Component.Create({
                 type: "textDisplay",
-                content: `${IconPill("Greenie", Translate(l, "joined"))}\n${Timestamp(member.joinedTimestamp!, "D")}`
+                content: `${IconPill("Greenie", Translate(l, "user:joined"))}\n${Timestamp(member.joinedTimestamp!, "D")}`
             });
         };
 
