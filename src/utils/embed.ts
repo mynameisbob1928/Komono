@@ -3,30 +3,23 @@ import { Colors } from "discord.js";
 import type { DeepPartial } from "../types/types";
 
 export namespace Embed {
-  export type EmbedOptions = {
+  export interface EmbedProps {
     title: string;
     description: string;
-
     url: string;
-
     image: string;
     thumb: string;
-
     timestamp: Date | number | string;
-    
     color: keyof typeof Colors;
-    
     author: {
       name: string;
       avatar: string;
       url: string;
     };
-    
     footer: {
       image: string;
       content: string;
     };
-
     fields: {
       name: string;
       content: string;
@@ -34,23 +27,18 @@ export namespace Embed {
     }[];
   };
 
-  export function Create(options: DeepPartial<EmbedOptions>) {
+  export function Create(props: DeepPartial<EmbedProps>) {
     return new EmbedBuilder({
-      title: options.title,
-      description: options.description,
-
-      color: Colors[(options.color || "DarkButNotBlack")],
-
-      author: options.author ? { name: options.author.name || "", icon_url: options.author.avatar || "", url: options.author.url || "" } : undefined,
-      footer: options.footer ? { text: options.footer.content || "", icon_url: options.footer.image || ""  } : undefined,
-
-      fields: options.fields ? (options.fields as EmbedOptions["fields"]).map((field) => ({ name: field.name, value: field.content, inline: field.inline })) : undefined,
-
-      url: options.url,
-      image: options.image ? { url: options.image } : undefined,
-      thumbnail: options.thumb ? { url: options.thumb } : undefined,
-
-      timestamp: options.timestamp ? new Date(options.timestamp as any).toISOString() : undefined
+      title: props.title,
+      description: props.description,
+      color: Colors[(props.color || "DarkButNotBlack")],
+      author: props.author ? { name: props.author.name || "", icon_url: props.author.avatar || "", url: props.author.url || "" } : undefined,
+      footer: props.footer ? { text: props.footer.content || "", icon_url: props.footer.image || ""  } : undefined,
+      fields: props.fields ? (props.fields as EmbedProps["fields"]).map((field) => ({ name: field.name, value: field.content, inline: field.inline })) : undefined,
+      url: props.url,
+      image: props.image ? { url: props.image } : undefined,
+      thumbnail: props.thumb ? { url: props.thumb } : undefined,
+      timestamp: props.timestamp ? new Date(props.timestamp as any).toISOString() : undefined
     });
   };
 };

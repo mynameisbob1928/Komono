@@ -1,12 +1,12 @@
-import { ActivityType, Collection, GatewayIntentBits, Options, Partials, Sweepers } from "discord.js";
-import { Env } from "../libs/env";
-import { Log } from "../utils/log";
-import { Debounce, TimeFormat } from "../utils/utils";
-import { ShardingClient } from "status-sharding";
-import type { ComponentType, EventType, PrefixType, SlashType } from "../types/types";
-import { Handler } from "../utils/handler";
-import FolderWatcher from "../utils/watcher";
+import { ActivityType, Collection, ComponentType, GatewayIntentBits, Options, Partials, Sweepers } from "discord.js";
+import { Env } from "libs/env";
 import path from "path";
+import { ShardingClient } from "status-sharding";
+import type { EventType, SlashType, PrefixType } from "types/types";
+import { Handler } from "utils/handler";
+import { Log } from "utils/log";
+import { Debounce, TimeFormat } from "utils/utils";
+import FolderWatcher from "utils/watcher";
 
 class Client extends ShardingClient {
     public events = new Collection<string, EventType>();

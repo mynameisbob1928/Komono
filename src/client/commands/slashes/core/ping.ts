@@ -12,7 +12,6 @@ export default new Slash({
     cooldown: 3,
     integrations: ["guild", "user"],
     contexts: ["guild", "bot", "DM"],
-    args: {},
     defer: true,
     async run(interaction, args) {
         const l = interaction.locale;

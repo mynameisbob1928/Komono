@@ -1,13 +1,13 @@
+import Event from "bases/event";
+import Prefix from "bases/prefix";
+import { Env } from "libs/env";
+import type { PrefixType } from "types/types";
+import { Container } from "utils/container";
+import { Component } from "utils/component";
+import { Cooldown } from "utils/cooldown";
+import { Log } from "utils/log";
+import { Highlight, Icon, Codeblock, Link } from "utils/markdown";
 import { ChannelType, MessageFlags } from "discord.js";
-import Event from "../../bases/event";
-import { Env } from "../../libs/env";
-import type { PrefixType } from "../../types/types";
-import { Log } from "../../utils/log";
-import { Codeblock, Highlight, Icon, Link } from "../../utils/markdown";
-import { Component } from "../../utils/component";
-import { Container } from "../../utils/container";
-import { Cooldown } from "../../utils/cooldown";
-import { Args } from "../../utils/arg";
 
 export default new Event({
     name: "message",
@@ -63,7 +63,7 @@ export default new Event({
 
         let args;
         try {
-            args = await Args.Parse(message.client, message, command.args)
+            args = await Prefix.Parse(message.client, message, command.args)
         } catch (e) {
             const text = Component.Create({
                 type: "textDisplay",

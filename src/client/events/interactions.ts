@@ -1,14 +1,14 @@
-import { CommandInteractionOptionResolver, InteractionType, MessageFlags } from "discord.js";
-import Event from "../../bases/event";
-import type { ComponentType, SlashType } from "../../types/types";
-import { Log } from "../../utils/log";
-import Slash from "../../bases/slash";
-import { Env } from "../../libs/env";
-import { Codeblock, Highlight, Link } from "../../utils/markdown";
-import { Cooldown } from "../../utils/cooldown";
-import { Component } from "../../utils/component";
-import { Container } from "../../utils/container";
+import Event from "bases/event";
+import Slash from "bases/slash";
+import { Env } from "libs/env";
 import { Translate } from "libs/locales";
+import type { SlashType, ComponentType } from "types/types";
+import { Container } from "utils/container";
+import { Component } from "utils/component";
+import { Cooldown } from "utils/cooldown";
+import { Log } from "utils/log";
+import { Highlight, Codeblock, Link } from "utils/markdown";
+import { CommandInteractionOptionResolver, InteractionType, MessageFlags } from "discord.js";
 
 export default new Event({
     name: "interactions",

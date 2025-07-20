@@ -1,6 +1,6 @@
 import { ClusterManager } from 'status-sharding';
-import { Env } from '../libs/env';
-import { Log } from '../utils/log';
+import { Env } from 'libs/env';
+import { Log } from 'utils/log';
 
 const client = 'src/client/app.ts';
 const token = Env.Required("token").ToString();

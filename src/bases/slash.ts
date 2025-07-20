@@ -1,14 +1,13 @@
 import { GuildMember, Role, SlashCommandBuilder, User, type LocalizationMap, ChannelType, ChatInputCommandInteraction, Locale, AutocompleteInteraction, type CacheType, ApplicationIntegrationType, InteractionContextType } from "discord.js";
 import type { allowedChannelTypes, CommandPermission, Optional } from "types/types";
-import { Log } from "utils/log";
 
-export type SlashType = "command" | "channel" | "boolean" | "string" | "number" | "option" | "group" | "user" | "role";
+export type SlashArgType = "command" | "channel" | "boolean" | "string" | "number" | "option" | "group" | "user" | "role";
 export type SlashLocalization = (Partial<Record<keyof LocalizationMap, string>> & { global: string; }) | string;
 
 export type Integrations = "guild" | "user";
 export type Contexts = "guild" | "DM" | "bot"
 
-export interface BaseItem<T extends SlashType> {
+export interface BaseItem<T extends SlashArgType> {
     name?: SlashLocalization;
     description?: SlashLocalization;
     type: T;
@@ -82,7 +81,7 @@ export interface SlashProps<T extends Record<string, SlashItem>> {
     description: SlashLocalization;
     integrations: Integrations[];
     contexts: Contexts[];
-    args: T;
+    args?: T;
     cooldown: number;
     permissions: CommandPermission;
     nsfw: boolean;
@@ -134,29 +133,29 @@ export default class Slash<T extends Record<string, SlashItem>> {
       };
     };
 
-    this.Parse(base, props.args);
+    this.Parse(base, props.args || {});
 
     return base;
   };
 
     public static Parse<T extends Record<string, SlashItem>>(base: SlashCommandBuilder, props: T) {
-      for (const [key, option] of Object.entries(props)) {
+      for (const [key, arg] of Object.entries(props)) {
       const name = key;
-      const description = typeof option.description === "string"
-        ? option.description
-        : option.description!.global;
+      const description = typeof arg.description === "string"
+        ? arg.description
+        : arg.description!.global;
 
-      const required = !!(option as any).required;
+      const required = !!(arg as any).required;
 
       const Localize = (opt: any) => {
-        if (option.name && typeof option.name !== "string") {
-          for (const [locale, value] of Object.entries(option.name)) {
+        if (arg.name && typeof arg.name !== "string") {
+          for (const [locale, value] of Object.entries(arg.name)) {
             if (locale !== "global") opt.setNameLocalization(locale, value);
           };
         };
 
-        if (option.description && typeof option.description !== "string") {
-          for (const [locale, value] of Object.entries(option.description)) {
+        if (arg.description && typeof arg.description !== "string") {
+          for (const [locale, value] of Object.entries(arg.description)) {
             if (locale !== "global") opt.setDescriptionLocalization(locale, value);
           };
         };
@@ -164,24 +163,24 @@ export default class Slash<T extends Record<string, SlashItem>> {
         return opt;
       };
 
-      if (option.type == "command" || option.type == "group") {
-        base[option.type === "command" ? "addSubcommand" : "addSubcommandGroup"]((base: any) => {
+      if (arg.type == "command" || arg.type == "group") {
+        base[arg.type === "command" ? "addSubcommand" : "addSubcommandGroup"]((base: any) => {
          this.Parse(base, props.args || {});
 
-          return Localize(base.setName(option.name).setDescription(option.description));
+          return Localize(base.setName(arg.name).setDescription(arg.description));
         });
 
         return base;
       };
 
-      switch (option.type) {
+      switch (arg.type) {
         case "string": {
           base.addStringOption(opt => {
-            opt.setName(name).setDescription(description).setRequired(required).setAutocomplete(!!option.autocomplete);
-            if ("maxLength" in option) opt.setMaxLength(option.maxLength!);
-            if ("minLength" in option) opt.setMinLength(option.minLength!);
-            if (option.choices && !option.autocomplete) {
-              for (const [label, value] of Object.entries(option.choices)) {
+            opt.setName(name).setDescription(description).setRequired(required).setAutocomplete(!!arg.autocomplete);
+            if ("maxLength" in arg) opt.setMaxLength(arg.maxLength!);
+            if ("minLength" in arg) opt.setMinLength(arg.minLength!);
+            if (arg.choices && !arg.autocomplete) {
+              for (const [label, value] of Object.entries(arg.choices)) {
                 if (!label || !value) continue;
 
                 opt.addChoices({ name: label, value });
@@ -196,10 +195,10 @@ export default class Slash<T extends Record<string, SlashItem>> {
         case "number": {
           base.addNumberOption(opt => {
             opt.setName(name).setDescription(description).setRequired(required);
-            if ("max" in option) opt.setMaxValue(option.max!);
-            if ("min" in option) opt.setMinValue(option.min!);
-            if (option.choices) {
-              for (const [label, value] of Object.entries(option.choices)) {
+            if ("max" in arg) opt.setMaxValue(arg.max!);
+            if ("min" in arg) opt.setMinValue(arg.min!);
+            if (arg.choices) {
+              for (const [label, value] of Object.entries(arg.choices)) {
                 if (!label || !value) continue;
 
                 opt.addChoices({ name: label, value });
@@ -235,10 +234,10 @@ export default class Slash<T extends Record<string, SlashItem>> {
         case "channel": {
           base.addChannelOption(opt => {
             opt.setName(name).setDescription(description).setRequired(required);
-            if ("channelType" in option && option.channelType) {
-              const types = Array.isArray(option.channelType)
-                ? option.channelType
-                : [option.channelType];
+            if ("channelType" in arg && arg.channelType) {
+              const types = Array.isArray(arg.channelType)
+                ? arg.channelType
+                : [arg.channelType];
               
                 opt.addChannelTypes(...types.map(t => ChannelType[t]));
             };
@@ -262,46 +261,46 @@ export default class Slash<T extends Record<string, SlashItem>> {
   public static Resolve<T extends Record<string, SlashItem>>(interaction: ChatInputCommandInteraction<CacheType>, props: T): { [K in keyof T]: SlashResolvedItem<T[K]> } {
     const result: Partial<{ [K in keyof T]: SlashResolvedItem<T[K]> }> = {};
 
-    for (const [key, option] of Object.entries(props) as [keyof T, SlashItem][]) {
-      switch (option.type) {
+    for (const [key, arg] of Object.entries(props) as [keyof T, SlashItem][]) {
+      switch (arg.type) {
         case "boolean": {
-          result[key] = interaction.options.getBoolean(key as string, (option as any).required) as any;
+          result[key] = interaction.options.getBoolean(key as string, (arg as any).required) as any;
           break;
         };
 
         case "string": {
-          result[key] = interaction.options.getString(key as string, (option as any).required) as any;
+          result[key] = interaction.options.getString(key as string, (arg as any).required) as any;
           break;
         };
 
         case "channel": {
-          result[key] = interaction.options.getChannel(key as string, (option as any).required) as any;
+          result[key] = interaction.options.getChannel(key as string, (arg as any).required) as any;
           break;
         };
 
         case "role": {
-          result[key] = interaction.options.getRole(key as string, (option as any).required) as any;
+          result[key] = interaction.options.getRole(key as string, (arg as any).required) as any;
           break;
         };
 
         case "number": {
-          result[key] = interaction.options.getNumber(key as string, (option as any).required) as any;
+          result[key] = interaction.options.getNumber(key as string, (arg as any).required) as any;
           break;
         };
 
         case "user": {
-          const isMember = (option as SlashItemUser).isMember;
+          const isMember = (arg as SlashItemUser).isMember;
           if (isMember) {
             result[key] = interaction.options.getMember(key as string) as any;
           } else {
-            result[key] = interaction.options.getUser(key as string, (option as any).required) as any;
+            result[key] = interaction.options.getUser(key as string, (arg as any).required) as any;
           };
           break;
         };
         
         case "group":
         case "command":
-          result[key] = Slash.Resolve(interaction, (option as SlashItemGroup | SlashItemCommand).body) as any;
+          result[key] = Slash.Resolve(interaction, (arg as SlashItemGroup | SlashItemCommand).body) as any;
           break;
       };
     };

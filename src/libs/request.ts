@@ -5,20 +5,17 @@ import { Env } from "./env";
 export namespace Request {
   export type RequestMethods = "GET" | "POST";
   
-  export type RequestResponse = {
+  export interface RequestResponse {
     TEXT: string;
     JSON: { [key: string]: any; };
     BUFFER: Buffer;
   };
 
-  export type RequestOptions<T extends keyof RequestResponse> = {
+  export interface RequestOptions<T extends keyof RequestResponse> {
     url: string;
-
     data?: any;
     method?: RequestMethods;
-    
     response?: T;
-
     params?: { [key: string]: any; };
     headers?: { [key: string]: any; };
   };

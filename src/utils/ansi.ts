@@ -1,5 +1,5 @@
 export namespace Ansi {
-    export const Colors: Record<string, string> = {
+    export const Colors: Record<string, string>  ={
         "reset": "\u001b[0m",
         "black": "\u001b[30m",
         "red": "\u001b[31m",
