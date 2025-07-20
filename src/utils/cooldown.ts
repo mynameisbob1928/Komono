@@ -1,23 +1,23 @@
-import { Collection, type Client } from "discord.js";
-import { SmallPill, Timestamp } from "./markdown";
+import { Collection, type Client } from 'discord.js';
+import { SmallPill, Timestamp } from './markdown';
 
 export namespace Cooldown {
-    export function Check(client: Client, id: string, command: string, cooldown: number) {
-        const now = Date.now();
+  export function Check(client: Client, id: string, command: string, cooldown: number) {
+    const now = Date.now();
 
-        let userCd = client.cooldown.get(id);
-        
-        if (!userCd) {
-            userCd = new Collection<string, number>();
-            client.cooldown.set(id, userCd);
-        };
+    let userCd = client.cooldown.get(id);
 
-        const expiresAt = userCd.get(command) || 0;
+    if (!userCd) {
+      userCd = new Collection<string, number>();
+      client.cooldown.set(id, userCd);
+    }
 
-        if (expiresAt > now) {
-            throw new Error(`Please wait ${Timestamp(expiresAt, "R")} before reusing the ${SmallPill(command)} command!`);
-        };
+    const expiresAt = userCd.get(command) || 0;
 
-        userCd.set(command, now + cooldown * 1000);
-    };
-};
+    if (expiresAt > now) {
+      throw new Error(`Please wait ${Timestamp(expiresAt, 'R')} before reusing the ${SmallPill(command)} command!`);
+    }
+
+    userCd.set(command, now + cooldown * 1000);
+  }
+}

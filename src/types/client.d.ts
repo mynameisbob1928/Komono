@@ -1,6 +1,6 @@
-import type { ClusterClient } from "status-sharding";
-import type { Client } from "discord.js";
-import type { ComponentType, EventType, PrefixType, SlashType } from "./types";
+import type { ClusterClient } from 'status-sharding';
+import type { Client } from 'discord.js';
+import type { ComponentType, EventType, PrefixType, SlashType } from './types';
 
 declare module 'discord.js' {
   interface Client {
@@ -11,5 +11,5 @@ declare module 'discord.js' {
     components: Collection<string, ComponentType>;
     cooldown: Collection<string, Collection<string, number>>;
     prefix: string;
-  };
-};
+  }
+}

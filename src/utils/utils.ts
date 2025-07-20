@@ -1,6 +1,6 @@
-import { SnowflakeUtil, type Message } from "discord.js";
-import fs from "fs";
-import path from "path";
+import { SnowflakeUtil, type Message } from 'discord.js';
+import fs from 'fs';
+import path from 'path';
 
 export function TimeFormat(duration: number | string) {
   const total = Math.floor(Number(duration) / 1000);
@@ -8,7 +8,7 @@ export function TimeFormat(duration: number | string) {
   const hours = Math.floor((total % (24 * 60 * 60)) / (60 * 60));
   const minutes = Math.floor((total % (60 * 60)) / 60);
   const seconds = total % 60;
-  const milliseconds = Math.floor(Number(duration) % 1000 / 100);
+  const milliseconds = Math.floor((Number(duration) % 1000) / 100);
 
   const parts = [];
 
@@ -18,26 +18,28 @@ export function TimeFormat(duration: number | string) {
   if (seconds > 0) parts.push(`${seconds}s`);
   if (milliseconds > 0 || (parts.length === 0 && Number(duration) < 1000)) parts.push(`${milliseconds}ms`);
 
-  return parts.join(" ");
-};
+  return parts.join(' ');
+}
 
 export async function Reference(message: Message) {
   let last = message;
-  let after = SnowflakeUtil.generate({ timestamp: message.createdTimestamp -1 }).toString();
+  let after = SnowflakeUtil.generate({
+    timestamp: message.createdTimestamp - 1,
+  }).toString();
 
   return (await message.channel.messages.fetch({ after })).reduce((list, current) => {
     if (current.reference && current.reference.messageId === last.id && current.author.id === message.author.id) {
       last = current;
       list.push(current);
-    };
+    }
 
     return list;
   }, [] as Message[]);
-};
+}
 
 export function Commas(num: number | string) {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
 
 export function ReadDirRecursive(dir: string, callback: (filepath: string, filename: string) => any): any[] {
   return fs.readdirSync(path.resolve(dir)).flatMap((filename) => {
@@ -45,11 +47,11 @@ export function ReadDirRecursive(dir: string, callback: (filepath: string, filen
 
     if (fs.statSync(filepath).isDirectory()) {
       return ReadDirRecursive(filepath, callback);
-    };
+    }
 
     return callback(filepath, filename);
   });
-};
+}
 
 export function Debounce(fn: any, delay: number) {
   let timeout: any;
@@ -58,4 +60,4 @@ export function Debounce(fn: any, delay: number) {
     clearTimeout(timeout);
     timeout = setTimeout(fn.bind(null, ...args), delay);
   };
-};
+}

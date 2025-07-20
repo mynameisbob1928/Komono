@@ -1,125 +1,118 @@
-import fs from "fs"
-import path from "path"
-import { Log } from "../utils/log";
+import fs from 'fs';
+import path from 'path';
+import { Log } from '../utils/log';
 
 enum ItemType {
-	FILE = 0,
-	DIRECTORY = 1,
-	SYMLINK = 2,
-	UNKNOWN = 3
-};
+  FILE = 0,
+  DIRECTORY = 1,
+  SYMLINK = 2,
+  UNKNOWN = 3,
+}
 
 export default class FolderWatcher {
+  public folder: string;
+  public recursive: boolean;
 
-	public folder: string;
-	public recursive: boolean;
+  public onAdd: null | ((filePath: string, type: ItemType) => void);
+  public onChange: null | ((filePath: string) => void);
+  public onRemove: null | ((filePath: string) => void);
 
-	public onAdd:    null | ((filePath: string, type: ItemType) => void);
-	public onChange: null | ((filePath: string) => void);
-	public onRemove: null | ((filePath: string) => void);
+  public watchers: Map<string, fs.FSWatcher>; // path -> watcher
 
-	public watchers: Map<string, fs.FSWatcher>; // path -> watcher
+  constructor(folder: string, recursive = true) {
+    this.watchers = new Map();
 
-	constructor (folder: string, recursive = true) {
+    this.folder = folder;
+    this.recursive = recursive;
 
-		this.watchers = new Map();
+    this.onAdd = null;
+    this.onRemove = null;
+    this.onChange = null;
 
-		this.folder = folder;
-		this.recursive = recursive;
+    this.addWatcher(folder);
+  }
 
-		this.onAdd    = null;
-		this.onRemove = null;
-		this.onChange = null;
+  public Destroy() {
+    for (const watcher of this.watchers.values()) {
+      watcher.close();
+    }
 
-		this.addWatcher(folder);
-	};
+    this.onAdd = null;
+    this.onRemove = null;
+    this.onChange = null;
+    this.watchers.clear();
+  }
 
-	public Destroy () {
-		for (const watcher of this.watchers.values()) {
-			watcher.close();
-		};
+  public GetItemType(file: string): ItemType {
+    try {
+      const stats = fs.lstatSync(file);
+      if (stats.isFile()) return ItemType.FILE;
+      if (stats.isDirectory()) return ItemType.DIRECTORY;
+      if (stats.isSymbolicLink()) return ItemType.SYMLINK;
+    } catch (err) {
+      Log.Write(`Error getting item type for file: ${file}`, 'red');
+      Log.Write(err, 'red');
+    }
 
-		this.onAdd = null;
-		this.onRemove = null;
-		this.onChange = null;
-		this.watchers.clear();
-	};
+    return ItemType.UNKNOWN;
+  }
 
-	public GetItemType(file: string): ItemType {
-		try {
-			const stats = fs.lstatSync(file);
-			if (stats.isFile()) return ItemType.FILE;
-			if (stats.isDirectory()) return ItemType.DIRECTORY;
-			if (stats.isSymbolicLink()) return ItemType.SYMLINK;
-		} catch (err) {
-			Log.Write(`Error getting item type for file: ${file}`, "red");
-			Log.Write(err, "red");
-		};
+  private Add(file: string) {
+    if (this.recursive && fs.lstatSync(file).isDirectory()) {
+      this.addWatcher(file);
+    }
 
-		return ItemType.UNKNOWN;
-	};
-	
+    if (this.onAdd) this.onAdd(file, this.GetItemType(file));
+  }
 
-	private Add (file: string) {
+  private Remove(file: string) {
+    for (const [path, watcher] of this.watchers) {
+      if (path.startsWith(file)) {
+        watcher.close();
+        this.watchers.delete(path);
+      }
+    }
 
-		if (this.recursive && fs.lstatSync(file).isDirectory()) {
-			this.addWatcher(file);
-		};
+    if (this.onRemove) this.onRemove(file);
+  }
 
-		if (this.onAdd) this.onAdd(file, this.GetItemType(file));
-	};
+  private Change(file: string) {
+    if (this.onChange) this.onChange(file);
+  }
 
-	private Remove (file: string) {
+  public WatcherEvent(path: string, event: 'change' | 'rename', filename: string | null) {
+    if (!filename) {
+      Log.Write(`Filename is null for path: ${path}`, 'yellow');
+      return;
+    }
 
-		for (const [path, watcher] of this.watchers) {
-			if (path.startsWith(file)) {
-				watcher.close();
-				this.watchers.delete(path);
-			};
-		};
+    const fullPath = `${path}/${filename}`;
+    if (event === 'change') {
+      this.Change(fullPath);
+    } else if (event === 'rename') {
+      if (fs.existsSync(fullPath)) {
+        this.Add(fullPath);
+      } else {
+        this.Remove(fullPath);
+      }
+    }
+  }
 
-		if (this.onRemove) this.onRemove(file);
-	};
+  public addWatcher(dir: string) {
+    if (this.watchers.has(dir)) return;
+    const watcher = fs.watch(dir, this.WatcherEvent.bind(this, dir));
+    this.watchers.set(dir, watcher);
 
-	private Change (file: string) {
-		if (this.onChange) this.onChange(file);
-	};
+    if (!this.recursive) return;
 
-	public WatcherEvent(path: string, event: 'change' | 'rename', filename: string | null) {
-
-		if (!filename) {
-			Log.Write(`Filename is null for path: ${path}`, "yellow");
-			return;
-		};
-	
-		const fullPath = `${path}/${filename}`;
-		if (event === 'change') {
-			this.Change(fullPath);
-		} else if (event === 'rename') {
-			if (fs.existsSync(fullPath)) {
-				this.Add(fullPath);
-			} else {
-				this.Remove(fullPath);
-			};
-		};
-	};
-	
-
-	public addWatcher (dir: string) {
-		if (this.watchers.has(dir)) return;
-		const watcher = fs.watch(dir, this.WatcherEvent.bind(this, dir));
-		this.watchers.set(dir, watcher);
-
-		if (!this.recursive) return;
-
-		const stats = fs.lstatSync(dir);
-		if (stats.isDirectory()) {
-			const items = fs.readdirSync(dir, { withFileTypes: true });
-			for (const item of items) {
-				if (item.isDirectory()) {
-					this.addWatcher(path.join(dir, item.name));
-				};
-			};
-		};
-	};
-};
+    const stats = fs.lstatSync(dir);
+    if (stats.isDirectory()) {
+      const items = fs.readdirSync(dir, { withFileTypes: true });
+      for (const item of items) {
+        if (item.isDirectory()) {
+          this.addWatcher(path.join(dir, item.name));
+        }
+      }
+    }
+  }
+}

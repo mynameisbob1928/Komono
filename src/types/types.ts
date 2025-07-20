@@ -1,11 +1,11 @@
-import { ChannelType, type ClientEvents, type PermissionResolvable } from "discord.js";
-import type { SlashItem } from "../bases/slash";
-import type Slash from "../bases/slash";
-import type Prefix from "../bases/prefix";
-import type { PrefixItem } from "../bases/prefix";
-import type Event from "../bases/event";
-import type { ComponentCategory } from "../bases/component";
-import type Component from "../bases/component";
+import { ChannelType, type ClientEvents, type PermissionResolvable } from 'discord.js';
+import type { SlashItem } from '../bases/slash';
+import type Slash from '../bases/slash';
+import type Prefix from '../bases/prefix';
+import type { PrefixItem } from '../bases/prefix';
+import type Event from '../bases/event';
+import type { ComponentCategory } from '../bases/component';
+import type Component from '../bases/component';
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -25,13 +25,13 @@ export enum allowedChannelTypes {
   PrivateThread = ChannelType.PrivateThread,
   GuildStageVoice = ChannelType.GuildStageVoice,
   GuildForum = ChannelType.GuildForum,
-  GuildMedia = ChannelType.GuildMedia
-};
+  GuildMedia = ChannelType.GuildMedia,
+}
 
 export interface CommandPermission {
   author: PermissionResolvable[];
   client: PermissionResolvable[];
-};
+}
 
 export type EventType<T extends keyof ClientEvents = any> = InstanceType<typeof Event<T>> & { path: string };
 export type SlashType<T extends Record<string, SlashItem> = any> = InstanceType<typeof Slash<T>> & { path: string };

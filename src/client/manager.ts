@@ -1,45 +1,45 @@
 import { ClusterManager } from 'status-sharding';
-import { Env } from 'libs/env';
+import Env from 'libs/env';
 import { Log } from 'utils/log';
 
 const client = 'src/client/app.ts';
-const token = Env.Required("token").ToString();
+const token = Env.Required('token');
 
 const manager = new ClusterManager(client, {
-    mode: "process",
-    token: token,
-    // shardsPerClusters: 4,
-    respawn: true,
-    heartbeat: {
-        enabled: true,
-        maxMissedHeartbeats: 2,
-        interval: 1000 * 10,
-        timeout: 1000 * 12
-    },
-    spawnOptions: {
-        delay: 6000
-    }
+  mode: 'process',
+  token: token,
+  // shardsPerClusters: 4,
+  respawn: true,
+  heartbeat: {
+    enabled: true,
+    maxMissedHeartbeats: 2,
+    interval: 1000 * 10,
+    timeout: 1000 * 12,
+  },
+  spawnOptions: {
+    delay: 6000,
+  },
 });
 
-process.on("uncaughtException", (error) => {
-  Log.Write(`Uncaught Exception: ${error}`, "red");
+process.on('uncaughtException', (error) => {
+  Log.Write(`Uncaught Exception: ${error}`, 'red');
 });
 
-process.on("unhandledRejection", (reason, promise) => {
-  Log.Write(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, "red");
+process.on('unhandledRejection', (reason, promise) => {
+  Log.Write(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, 'red');
 });
 
-process.on("warning", (warning) => {
-  Log.Write(`WARNING: ${warning.name} : ${warning.message}`, "red");
+process.on('warning', (warning) => {
+  Log.Write(`WARNING: ${warning.name} : ${warning.message}`, 'red');
 });
 
-manager.on("clusterCreate", (cluster) => {
-  cluster.on("ready", () => {
-    Log.Write(`Cluster ${cluster.id} is ready!`, "green")
+manager.on('clusterCreate', (cluster) => {
+  cluster.on('ready', () => {
+    Log.Write(`Cluster ${cluster.id} is ready!`, 'green');
   });
 
-  cluster.on("death", (cluster) => {
-    Log.Write(`Cluster ${cluster.id} died.`, "red")
+  cluster.on('death', (cluster) => {
+    Log.Write(`Cluster ${cluster.id} died.`, 'red');
   });
 });
 

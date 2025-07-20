@@ -58,7 +58,7 @@ export const Emojis: Record<string, string> = {
   Insights: '<:Insights:1271195727602778254>',
   List: '<:List:1271581450818293802>',
   Globe: '<:Globe:1270865293001887846>',
-  Info:  '<:Info:1270866745749671977>',
+  Info: '<:Info:1270866745749671977>',
   Web: '<:Web:1270865223061995530>',
   Dev: '<:Dev:1270864921172901890>',
   Search: '<:Search:1270864878076428318>',
@@ -107,5 +107,5 @@ export const Emojis: Record<string, string> = {
   Pen: '<:Pen:1269699778930020394>',
   Discord: '<:Discord:1270682969190825994>',
   Flag: '<:Flag:1270682918141825138>',
-  NeutralPing: '<:NeutralPing:1270684584211906654>'
+  NeutralPing: '<:NeutralPing:1270684584211906654>',
 };

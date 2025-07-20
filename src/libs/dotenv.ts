@@ -1,10 +1,9 @@
-import { Collection } from 'discord.js';
 import fs from 'fs';
 
-export default new (class Env {
-  #_values = new Collection<string, string>();
+export default new (class DotEnv {
+  #_values = new Map<string, string>();
 
-  public ToString(content: any) {
+  public static ToString(content: any) {
     if (typeof content == 'object') {
       return JSON.stringify(content);
     }
@@ -25,12 +24,12 @@ export default new (class Env {
       return this.Get(key)!;
     }
 
-    this.#_values.set(key, this.ToString(value));
+    this.#_values.set(key, DotEnv.ToString(value));
 
     return this.Get(key)!;
   }
 
-  public Required(key: string) {
+  public required(key: string, errMsg = "'$key' is required") {
     if (!this.Has(key)) {
       throw new Error(`"${key}" is required`);
     }
@@ -42,8 +41,8 @@ export default new (class Env {
     let path = `${process.cwd()}/.env`;
 
     if (fs.existsSync(path) && fs.statSync(path).isFile()) {
-      fs.readFileSync(path, 'utf-8').replace(/^(.+?):(.+)$/gm, (_, name, value) => {
-        this.#_values.set(name.trim(), value.trim());
+      fs.readFileSync(path, 'utf-8').replace(/^(.+?)=(.+)$/gm, (_, name, value) => {
+        this.#_values.set(name, value);
 
         return '';
       });
