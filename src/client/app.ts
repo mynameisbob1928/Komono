@@ -9,6 +9,7 @@ import { Register } from 'handlers/register';
 import { Log } from 'utils/log';
 import { Debounce, TimeFormat } from 'utils/utils';
 import FolderWatcher from 'utils/watcher';
+import Prisma from 'libs/database';
 
 class Client extends ShardingClient {
   public events = new Collection<string, EventType>();
@@ -91,6 +92,9 @@ process.on('SIGINT', async () => {
   Log('Shutting down Komono...', 'cyan');
   await client.destroy();
 
+  Log('Shutting down prisma...', 'cyan');
+  await Prisma.$disconnect();
+
   process.exit(0);
 });
 
@@ -98,7 +102,7 @@ await Initialize(client, {
   events: `${__dirname}/events`,
   slashes: `${__dirname}/commands/slashes`,
   prefixes: `${__dirname}/commands/prefixes`,
-  components: `${__dirname}/components`,
+  // components: `${__dirname}/components`,
 });
 
 const watcher = new FolderWatcher(path.join('src', 'client'), true);
@@ -115,16 +119,19 @@ async function HotReload(filepath: string) {
       cache = client.events;
       break;
     }
+
     case normalized.includes(path.join('commands', 'slashes')): {
       dir = path.join('src', 'client', 'commands', 'slashes');
       cache = client.slashes;
       break;
     }
+
     case normalized.includes(path.join('commands', 'prefixes')): {
       dir = path.join('src', 'client', 'commands', 'prefixes');
       cache = client.prefixes;
       break;
     }
+
     case normalized.includes(path.join('components')): {
       dir = path.join('src', 'client', 'components');
       cache = client.components;

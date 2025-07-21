@@ -14,16 +14,7 @@ import {
 } from 'discord.js';
 import type { allowedChannelTypes, CommandPermission, Optional } from 'types/types';
 
-export type SlashArgType =
-  | 'command'
-  | 'channel'
-  | 'boolean'
-  | 'string'
-  | 'number'
-  | 'option'
-  | 'group'
-  | 'user'
-  | 'role';
+export type SlashArgType = 'string' | 'number' | 'boolean' | 'channel' | 'user' | 'role' | 'command' | 'group';
 export type SlashLocalization = (Partial<Record<keyof LocalizationMap, string>> & { global: string }) | string;
 
 export type Integrations = 'guild' | 'user';
@@ -118,9 +109,9 @@ export interface SlashProps<T extends Record<string, SlashItem>> {
   description: SlashLocalization;
   integrations: Integrations[];
   contexts: Contexts[];
-  args?: T;
   cooldown: number;
   permissions: CommandPermission;
+  args: T;
   nsfw: boolean;
   dev: boolean;
   defer: boolean;
@@ -147,7 +138,7 @@ export default class Slash<T extends Record<string, SlashItem>> {
   public static Build<T extends Record<string, SlashItem>>(
     props: Optional<
       SlashProps<T>,
-      'cooldown' | 'defer' | 'ephemeral' | 'permissions' | 'nsfw' | 'dev' | 'autocomplete'
+      'cooldown' | 'permissions' | 'args' | 'nsfw' | 'dev' | 'defer' | 'ephemeral' | 'autocomplete'
     >,
   ) {
     const base = new SlashCommandBuilder()

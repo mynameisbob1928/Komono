@@ -74,19 +74,20 @@ export type PrefixResolvedItem<T extends PrefixItem> = T extends PrefixArgRole
 
 export interface PrefixProps<T extends Record<string, PrefixItem>> {
   name: string;
-  aliases?: string[];
+  aliases: string[];
   description: string;
-  cooldown?: number;
-  permissions?: CommandPermission;
-  nsfw?: boolean;
-  dev?: boolean;
-  args?: T;
+  cooldown: number;
+  permissions: CommandPermission;
+  nsfw: boolean;
+  dev: boolean;
+  args: T;
   run(client: Client, message: Message, args: { [K in keyof T]: PrefixResolvedItem<T[K]> }): any;
 }
 
 export default class Prefix<T extends Record<string, PrefixItem>> {
   public name;
   public aliases;
+  public description;
   public cooldown;
   public permissions;
   public nsfw;
@@ -266,16 +267,17 @@ export default class Prefix<T extends Record<string, PrefixItem>> {
     return solved;
   }
 
-  constructor(props: Optional<PrefixProps<T>, 'aliases' | 'cooldown' | 'args' | 'permissions' | 'nsfw' | 'dev'>) {
+  constructor(props: Optional<PrefixProps<T>, 'aliases' | 'cooldown' | 'permissions' | 'args' | 'nsfw' | 'dev'>) {
     props.permissions = props.permissions || { client: [], author: [] };
 
     this.name = props.name;
     this.aliases = props.aliases || [];
+    this.description = props.description;
     this.cooldown = props.cooldown;
     this.permissions = props.permissions;
+    this.args = props.args || {};
     this.nsfw = !!props.nsfw;
     this.dev = !!props.dev;
-    this.args = props.args || {};
     this.run = props.run;
   }
 }
