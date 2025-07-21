@@ -38,30 +38,18 @@ export class Container extends ContainerBuilder {
     if (props.spoiler) this.setSpoiler(props.spoiler);
 
     for (const component of props.components) {
-      switch (component.constructor) {
-        case FileBuilder: {
-          this.addFileComponents(component as FileBuilder);
-          break;
-        }
-        case MediaGalleryBuilder: {
-          this.addMediaGalleryComponents(component as MediaGalleryBuilder);
-          break;
-        }
-        case SectionBuilder: {
-          this.addSectionComponents(component as SectionBuilder);
-          break;
-        }
-        case TextDisplayBuilder: {
-          this.addTextDisplayComponents(component as TextDisplayBuilder);
-          break;
-        }
-        case SeparatorBuilder: {
-          this.addSeparatorComponents(component as SeparatorBuilder);
-          break;
-        }
-        case ActionRowBuilder: {
-          this.addActionRowComponents(component as ActionRowBuilder<ActionRowComponent>);
-        }
+      if (component instanceof FileBuilder) {
+        this.addFileComponents(component);
+      } else if (component instanceof MediaGalleryBuilder) {
+        this.addMediaGalleryComponents(component);
+      } else if (component instanceof SectionBuilder) {
+        this.addSectionComponents(component);
+      } else if (component instanceof TextDisplayBuilder) {
+        this.addTextDisplayComponents(component);
+      } else if (component instanceof SeparatorBuilder) {
+        this.addSeparatorComponents(component);
+      } else if (component instanceof ActionRowBuilder) {
+        this.addActionRowComponents(component as ActionRowBuilder<ActionRowComponent>);
       }
     }
   }

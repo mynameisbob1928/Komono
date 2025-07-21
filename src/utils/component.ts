@@ -171,7 +171,9 @@ export interface MediaGalleryProps {
 
 export class MediaGallery extends MediaGalleryBuilder {
   constructor(props: MediaGalleryProps) {
-    super(props);
+    super({
+      items: props.items,
+    });
   }
 }
 
@@ -195,7 +197,7 @@ export interface TextDisplayProps {
 
 export class TextDisplay extends TextDisplayBuilder {
   constructor(props: TextDisplayProps) {
-    super(props);
+    super({ content: props.content });
   }
 }
 
@@ -217,7 +219,10 @@ export interface SeparatorProps {
 
 export class Separator extends SeparatorBuilder {
   constructor(props: SeparatorProps) {
-    super(props);
+    super({
+      spacing: props.spacing,
+      divider: props.divider,
+    });
   }
 }
 
