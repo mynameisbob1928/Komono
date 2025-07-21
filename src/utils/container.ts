@@ -15,57 +15,54 @@ import {
   ChannelSelectMenuBuilder,
 } from 'discord.js';
 
-export namespace Container {
-  export interface ContainerProps {
-    id?: number;
-    components: ContainerComponentBuilder[];
-    color?: number;
-    spoiler?: boolean;
-  }
+export interface ContainerProps {
+  id?: number;
+  components: ContainerComponentBuilder[];
+  color?: number;
+  spoiler?: boolean;
+}
 
-  export type ActionRowComponent =
-    | ButtonBuilder
-    | StringSelectMenuBuilder
-    | UserSelectMenuBuilder
-    | RoleSelectMenuBuilder
-    | MentionableSelectMenuBuilder
-    | ChannelSelectMenuBuilder;
+export type ActionRowComponent =
+  | ButtonBuilder
+  | StringSelectMenuBuilder
+  | UserSelectMenuBuilder
+  | RoleSelectMenuBuilder
+  | MentionableSelectMenuBuilder
+  | ChannelSelectMenuBuilder;
 
-  export function Create(props: ContainerProps) {
-    const container = new ContainerBuilder();
-
-    if (props.id) container.setId(props.id);
-    if (props.color) container.setAccentColor(props.color);
-    if (props.spoiler) container.setSpoiler(props.spoiler);
+export class Container extends ContainerBuilder {
+  constructor(props: ContainerProps) {
+    super();
+    if (props.id) this.setId(props.id);
+    if (props.color) this.setAccentColor(props.color);
+    if (props.spoiler) this.setSpoiler(props.spoiler);
 
     for (const component of props.components) {
       switch (component.constructor) {
         case FileBuilder: {
-          container.addFileComponents(component as FileBuilder);
+          this.addFileComponents(component as FileBuilder);
           break;
         }
         case MediaGalleryBuilder: {
-          container.addMediaGalleryComponents(component as MediaGalleryBuilder);
+          this.addMediaGalleryComponents(component as MediaGalleryBuilder);
           break;
         }
         case SectionBuilder: {
-          container.addSectionComponents(component as SectionBuilder);
+          this.addSectionComponents(component as SectionBuilder);
           break;
         }
         case TextDisplayBuilder: {
-          container.addTextDisplayComponents(component as TextDisplayBuilder);
+          this.addTextDisplayComponents(component as TextDisplayBuilder);
           break;
         }
         case SeparatorBuilder: {
-          container.addSeparatorComponents(component as SeparatorBuilder);
+          this.addSeparatorComponents(component as SeparatorBuilder);
           break;
         }
         case ActionRowBuilder: {
-          container.addActionRowComponents(component as ActionRowBuilder<ActionRowComponent>);
+          this.addActionRowComponents(component as ActionRowBuilder<ActionRowComponent>);
         }
       }
     }
-
-    return container;
   }
 }

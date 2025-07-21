@@ -58,6 +58,8 @@ titanium/
   src/
     bases/         # Base classes: Prefix, Slash, Event, Component
     client/        # Entrypoint, commands, events, components
+    core/
+      handlers/    # Loader, Listener, Register (hot reload logic)
     libs/          # Integrations: database, env, locales, requests
     locales/       # Translations
     types/         # Global types
@@ -71,7 +73,8 @@ titanium/
 - The custom loader reads the `.env` file in the format `key:value` (do not use `=`!).
 - Example:
   ```
-  token:your_token
+  token:bot_token
+  id:bot_id
   dev:["123456789", "987654321"]
   ```
 - For arrays or objects, use JSON: `["id1", "id2"]` or `{ "foo": "bar" }`
@@ -222,8 +225,8 @@ titanium/
 - **ANSI for logs and messages**
 
   ```ts
-  import { Ansi } from 'utils/ansi';
-  console.log(Ansi.Format('Hello World', 'red'));
+  import { FormatAnsi } from 'utils/ansi';
+  console.log(FormatAnsi('Hello World', 'red'));
   ```
 
   - Colors: `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `black` (and aliases: `r`, `g`, etc.)
@@ -232,11 +235,13 @@ titanium/
 
   ```ts
   import { Embed } from 'utils/embed';
-  const embed = Embed.Create({
+  const embed = new Embed({
     title: 'Hello!',
     description: 'Embed message',
     color: 'Blue',
   });
+  // Uso:
+  // await interaction.reply({ embeds: [embed] });
   ```
 
 - **Markdown Helpers**
@@ -249,14 +254,55 @@ titanium/
 - **Cooldown**
 
   ```ts
-  import { Cooldown } from 'utils/cooldown';
-  Cooldown.Check(client, userId, commandName, cooldownSeconds);
+  import { CheckCooldown } from 'utils/cooldown';
+  CheckCooldown(client, userId, commandName, cooldownSeconds);
   ```
 
 - **Logging**
+
   ```ts
   import { Log } from 'utils/log';
-  Log.Write('Message', 'green');
+  Log('Message', 'green');
+  ```
+
+- **Component Builders**
+
+  ```ts
+  import { Button, StringSelectMenu, ActionRow } from 'utils/component';
+  import { ButtonStyle } from 'discord.js';
+
+  const button = new Button({
+    customId: 'my-btn',
+    label: 'Clique aqui!',
+    style: ButtonStyle.Primary,
+  });
+
+  const selectMenu = new StringSelectMenu({
+    customId: 'my-menu',
+    placeholder: 'Escolha uma opção',
+    options: [
+      { label: 'Opção 1', value: '1' },
+      { label: 'Opção 2', value: '2' },
+    ],
+  });
+
+  const row = new ActionRow(button, selectMenu);
+  // Uso:
+  // await interaction.reply({ components: [row] });
+  ```
+
+- **Container Builder**
+
+  ```ts
+  import { Container } from 'utils/container';
+  import { Button } from 'utils/component';
+
+  const container = new Container({
+    components: [new Button({ customId: 'ok', label: 'OK', style: 1 })],
+    color: 0x5865f2,
+  });
+  // Uso:
+  // await interaction.reply({ components: [container] });
   ```
 
 ---
@@ -264,7 +310,20 @@ titanium/
 ## ♻️ Hot Reload
 
 - The bot automatically reloads commands, events, and components when files are saved.
-- The system uses the `Handler` (`src/utils/handler.ts`) and the custom watcher (`src/utils/watcher.ts`).
+- The system uses the handlers in `src/core/handlers/` (`loader.ts`, `listener.ts`, `register.ts`) and the custom watcher (`src/utils/watcher.ts`).
+- Example usage:
+
+  ```ts
+  import { Load, Initialize, Reload } from 'core/handlers/loader';
+  import { Bind, Unbind } from 'core/handlers/listener';
+  import { Register } from 'core/handlers/register';
+
+  await Initialize(client, paths);
+  await Reload(client, path, cache);
+  Bind(client);
+  Unbind(client);
+  await Register(client);
+  ```
 
 ---
 

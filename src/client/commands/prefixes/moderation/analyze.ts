@@ -1,9 +1,9 @@
-import Prefix from 'bases/prefix';
+import Prefix from 'core/bases/prefix';
 import { MessageFlags } from 'discord.js';
 import Env from 'libs/env';
 import { Request } from 'libs/request';
-import { Ansi } from 'utils/ansi';
-import { Component } from 'utils/component';
+import { FormatAnsi } from 'utils/ansi';
+import { TextDisplay } from 'utils/component';
 import { Container } from 'utils/container';
 import { Codeblock, Highlight, IconPill, Link } from 'utils/markdown';
 
@@ -23,7 +23,7 @@ export default new Prefix({
     const msg = args.message;
     const key = Env.Required('perspective');
 
-    const res = await Request.Request({
+    const res = await Request({
       url: `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${key}`,
       method: 'POST',
       response: 'JSON',
@@ -70,20 +70,18 @@ export default new Prefix({
         else if (raw >= 0.5) color = 'y';
 
         return {
-          display: Ansi.Format(`${score}%`, color) + `   ${formatted}`,
+          display: FormatAnsi(`${score}%`, color) + `   ${formatted}`,
           numeric: parseFloat(score),
         };
       })
       .sort((a, b) => b.numeric - a.numeric)
       .map((item) => item.display);
 
-    const text = Component.Create({
-      type: 'textDisplay',
-      content: `${IconPill('Insights', 'Scores')} ${Link('https://developers.perspectiveapi.com/s/about-the-api-attributes-and-languages', 'What do these mean?', 'Check out the detection details.')}
-            \n${Highlight(msg)} was flagged as\n${Codeblock('ansi', result.join('\n'))}`,
+    const text = new TextDisplay({
+      content: `${IconPill('Insights', 'Scores')} ${Link('https://developers.perspectiveapi.com/s/about-the-api-attributes-and-languages', 'What do these mean?', 'Check out the detection details.')}\n${Highlight(msg)} was flagged as\n${Codeblock('ansi', result.join('\n'))}`,
     });
 
-    const container = Container.Create({ components: [text] });
+    const container = new Container({ components: [text] });
 
     await message.reply({
       components: [container],

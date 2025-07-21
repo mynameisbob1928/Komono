@@ -28,7 +28,8 @@
     // Paths
     "baseUrl": "./src",
     "paths": {
-      "bases/*": ["bases/*"],
+      "bases/*": ["core/bases/*"],
+      "handlers/*": ["core/handlers/*"],
       "libs/*": ["libs/*"],
       "utils/*": ["utils/*"],
       "types/*": ["types/*"],

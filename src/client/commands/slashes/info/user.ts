@@ -1,8 +1,8 @@
-import Slash from 'bases/slash';
+import Slash from 'core/bases/slash';
 import { MessageFlags, SeparatorSpacingSize } from 'discord.js';
 import Env from 'libs/env';
 import { Translate } from 'libs/locales';
-import { Component } from 'utils/component';
+import { Section, Separator, TextDisplay, Thumbnail } from 'utils/component';
 import { Container } from 'utils/container';
 import { Icon, IconPill, Pill, SmallPill, Timestamp } from 'utils/markdown';
 
@@ -113,50 +113,40 @@ export default new Slash({
 
     const avatar = user.avatarURL?.() ?? user.defaultAvatarURL;
 
-    const text1 = Component.Create({
-      type: 'textDisplay',
+    const text1 = new TextDisplay({
       content: `${Icon('Mention')} **${user.username}** ${Pill(`${user.id}`)}\n${icons}${tag}`,
     });
-
-    const text2 = Component.Create({
-      type: 'textDisplay',
+    const text2 = new TextDisplay({
       content: `${IconPill('Member', Translate(l, 'user:display'))}\n${SmallPill(member ? member.displayName : user.displayName)}`,
     });
-
-    const text3 = Component.Create({
-      type: 'textDisplay',
+    const text3 = new TextDisplay({
       content: `${IconPill('Calendar', Translate(l, 'user:created'))}\n${Timestamp(user.createdTimestamp, 'D')}`,
     });
 
     let text4;
     if (member) {
-      text4 = Component.Create({
-        type: 'textDisplay',
+      text4 = new TextDisplay({
         content: `${IconPill('Greenie', Translate(l, 'user:joined'))}\n${Timestamp(member.joinedTimestamp!, 'D')}`,
       });
     }
 
-    const thumb = Component.Create({
-      type: 'thumbnail',
-      media: avatar,
+    const thumb = new Thumbnail({
+      url: avatar,
       description: 'User avatar',
     });
 
-    const sect = Component.Create({
-      type: 'section',
+    const sect = new Section({
       components: [text1],
       accessory: thumb,
     });
 
-    const sep = Component.Create({
-      type: 'separator',
+    const sep = new Separator({
       spacing: SeparatorSpacingSize.Large,
       divider: true,
     });
 
-    const container = Container.Create({
-      components: [sect, sep, text2, text3],
-    });
+    const container = new Container({ components: [sect, sep, text2, text3] });
+
     if (text4 !== undefined) {
       container.addTextDisplayComponents(text4);
     }

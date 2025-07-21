@@ -1,10 +1,10 @@
-import Prefix from 'bases/prefix';
+import Prefix from 'core/bases/prefix';
 import Env from 'libs/env';
 import Prisma from 'libs/database';
 import { AttachmentBuilder, MessageFlags } from 'discord.js';
-import { Component } from 'utils/component';
-import { Icon, Link } from 'utils/markdown';
+import { Section, TextDisplay, Thumbnail } from 'utils/component';
 import { Container } from 'utils/container';
+import { Icon, Link } from 'utils/markdown';
 import { Request } from 'libs/request';
 import { Commas } from 'utils/utils';
 
@@ -33,12 +33,9 @@ export default new Prefix({
         create: { userId, username },
       });
 
-      const text = Component.Create({
-        type: 'textDisplay',
-        content: `${Icon('Sucess')} Last.fm username saved as **${username}**!`,
-      });
+      const text = new TextDisplay({ content: `${Icon('Sucess')} Last.fm username saved as **${username}**!` });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],
@@ -49,12 +46,11 @@ export default new Prefix({
 
     const data = await Prisma.lastfm.findUnique({ where: { userId } });
     if (!data) {
-      const text = Component.Create({
-        type: 'textDisplay',
+      const text = new TextDisplay({
         content: `${Icon('Error')} You need to set your Last.fm username first with the command, e.g., k.lastfm <username>`,
       });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],
@@ -65,25 +61,24 @@ export default new Prefix({
 
     const username = data.username;
 
-    const trackRes = await Request.Request({
+    const trackRes = await Request({
       url: `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${encodeURIComponent(username)}&api_key=${key}&format=json&limit=1`,
       method: 'GET',
       response: 'JSON',
     });
 
-    const userRes = await Request.Request({
+    const userRes = await Request({
       url: `https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${encodeURIComponent(username)}&api_key=${key}&format=json&limit=1`,
       method: 'GET',
       response: 'JSON',
     });
 
     if (!userRes) {
-      const text = Component.Create({
-        type: 'textDisplay',
+      const text = new TextDisplay({
         content: `${Icon('Error')} Username "${username}" is invalid. Please update it using the command k.lastfm <username>`,
       });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],
@@ -94,12 +89,9 @@ export default new Prefix({
 
     const tracks = trackRes.recentTracks?.track;
     if (!tracks) {
-      const text = Component.Create({
-        type: 'textDisplay',
-        content: `${Icon('Error')} No recent tracks found`,
-      });
+      const text = new TextDisplay({ content: `${Icon('Error')} No recent tracks found` });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],
@@ -112,12 +104,9 @@ export default new Prefix({
 
     const playing = track['@attr']?.nowplaying === 'true';
     if (!playing) {
-      const text = Component.Create({
-        type: 'textDisplay',
-        content: `${Icon('Error')} No track playing right now`,
-      });
+      const text = new TextDisplay({ content: `${Icon('Error')} No track playing right now` });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],
@@ -135,31 +124,22 @@ export default new Prefix({
       attach = new AttachmentBuilder(buffer, { name: 'cover.jpg' });
     }
 
-    const text1 = Component.Create({
-      type: 'textDisplay',
+    const text1 = new TextDisplay({
       content: `${message.author} is playing ${Link(track.url, track.name)} by ${track.artist['#text']}`,
     });
-
-    const text2 = Component.Create({
-      type: 'textDisplay',
-      content: `## ${Link(track.url, `${track.name} ・ ${track.artist['#text']}`)}`,
-    });
-
-    const text3 = Component.Create({
-      type: 'textDisplay',
+    const text2 = new TextDisplay({ content: `## ${Link(track.url, `${track.name} ・ ${track.artist['#text']}`)}` });
+    const text3 = new TextDisplay({
       content: `Album: **${track.album?.['#text'] ?? 'Album not found'}** ・ Scrobbles: **${Commas(userRes.playcount) || 'N/A'}**`,
     });
 
     let content;
     if (attach) {
-      const thumb = Component.Create({
-        type: 'thumbnail',
+      const thumb = new Thumbnail({
         description: 'Cover image',
-        media: 'attachment://cover.jpg',
+        url: 'attachment://cover.jpg',
       });
 
-      const sect = Component.Create({
-        type: 'section',
+      const sect = new Section({
         components: [text3],
         accessory: thumb,
       });
@@ -169,7 +149,7 @@ export default new Prefix({
       content = text3;
     }
 
-    const container = Container.Create({ components: [text2, content] });
+    const container = new Container({ components: [text2, content] });
 
     await message.reply({
       components: [text1, container],

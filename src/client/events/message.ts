@@ -1,10 +1,10 @@
-import Event from 'bases/event';
-import Prefix from 'bases/prefix';
+import Event from 'core/bases/event';
+import Prefix from 'core/bases/prefix';
 import Env from 'libs/env';
 import type { PrefixType } from 'types/types';
+import { TextDisplay } from 'utils/component';
 import { Container } from 'utils/container';
-import { Component } from 'utils/component';
-import { Cooldown } from 'utils/cooldown';
+import { CheckCooldown } from 'utils/cooldown';
 import { Log } from 'utils/log';
 import { Highlight, Icon, Codeblock, Link } from 'utils/markdown';
 import { ChannelType, MessageFlags } from 'discord.js';
@@ -33,7 +33,7 @@ export default new Event({
     ) as PrefixType;
     if (!command) return;
 
-    Log.Write(`Received prefix command interaction: ${command.name}`, 'green');
+    Log(`Received prefix command interaction: ${command.name}`, 'green');
 
     if (command.dev === true && !dev.includes(message.author.id)) return;
 
@@ -53,12 +53,9 @@ export default new Event({
     }
 
     if (command.nsfw && message.channel.type === ChannelType.GuildText && !message.channel.nsfw) {
-      const text = Component.Create({
-        type: 'textDisplay',
-        content: `${Icon('Nsfw')} this command is only available in NSFW channels.`,
-      });
+      const text = new TextDisplay({ content: `${Icon('Nsfw')} this command is only available in NSFW channels.` });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],
@@ -68,7 +65,7 @@ export default new Event({
     }
 
     try {
-      Cooldown.Check(message.client, message.author.id, command.name, command.cooldown || 0);
+      CheckCooldown(message.client, message.author.id, command.name, command.cooldown || 0);
     } catch (e) {
       if (!dev.includes(message.author.id)) {
         await message.reply((e as Error).message);
@@ -81,12 +78,9 @@ export default new Event({
     try {
       args = await Prefix.Parse(message.client, message, command.args);
     } catch (e) {
-      const text = Component.Create({
-        type: 'textDisplay',
-        content: `${Icon('Warning')} ${Highlight((e as Error).message)}`,
-      });
+      const text = new TextDisplay({ content: `${Icon('Warning')} ${Highlight((e as Error).message)}` });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],
@@ -98,13 +92,12 @@ export default new Event({
     try {
       await command.run(message.client, message, args);
     } catch (e) {
-      Log.Write(e, 'red');
-      const text = Component.Create({
-        type: 'textDisplay',
+      Log(e, 'red');
+      const text = new TextDisplay({
         content: `Something went wrong while attempting to run this command.\n${Codeblock('ansi', (e as Error).message)}\n-# Contact support ${Link('https://discord.gg/7b234YFhmn', 'here')}`,
       });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],

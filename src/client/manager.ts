@@ -22,24 +22,24 @@ const manager = new ClusterManager(client, {
 });
 
 process.on('uncaughtException', (error) => {
-  Log.Write(`Uncaught Exception: ${error}`, 'red');
+  Log(`Uncaught Exception: ${error}`, 'red');
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  Log.Write(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, 'red');
+  Log(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, 'red');
 });
 
 process.on('warning', (warning) => {
-  Log.Write(`WARNING: ${warning.name} : ${warning.message}`, 'red');
+  Log(`WARNING: ${warning.name} : ${warning.message}`, 'red');
 });
 
 manager.on('clusterCreate', (cluster) => {
   cluster.on('ready', () => {
-    Log.Write(`Cluster ${cluster.id} is ready!`, 'green');
+    Log(`Cluster ${cluster.id} is ready!`, 'green');
   });
 
   cluster.on('death', (cluster) => {
-    Log.Write(`Cluster ${cluster.id} died.`, 'red');
+    Log(`Cluster ${cluster.id} died.`, 'red');
   });
 });
 

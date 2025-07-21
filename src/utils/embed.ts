@@ -2,33 +2,33 @@ import { EmbedBuilder } from '@discordjs/builders';
 import { Colors } from 'discord.js';
 import type { DeepPartial } from '../types/types';
 
-export namespace Embed {
-  export interface EmbedProps {
-    title: string;
-    description: string;
+export interface EmbedProps {
+  title: string;
+  description: string;
+  url: string;
+  image: string;
+  thumb: string;
+  timestamp: Date | number | string;
+  color: keyof typeof Colors;
+  author: {
+    name: string;
+    avatar: string;
     url: string;
+  };
+  footer: {
     image: string;
-    thumb: string;
-    timestamp: Date | number | string;
-    color: keyof typeof Colors;
-    author: {
-      name: string;
-      avatar: string;
-      url: string;
-    };
-    footer: {
-      image: string;
-      content: string;
-    };
-    fields: {
-      name: string;
-      content: string;
-      inline: boolean;
-    }[];
-  }
+    content: string;
+  };
+  fields: {
+    name: string;
+    content: string;
+    inline: boolean;
+  }[];
+}
 
-  export function Create(props: DeepPartial<EmbedProps>) {
-    return new EmbedBuilder({
+export class Embed extends EmbedBuilder {
+  constructor(props: DeepPartial<EmbedProps>) {
+    super({
       title: props.title,
       description: props.description,
       color: Colors[props.color || 'DarkButNotBlack'],

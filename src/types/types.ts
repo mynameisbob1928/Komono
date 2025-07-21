@@ -1,11 +1,11 @@
 import { ChannelType, type ClientEvents, type PermissionResolvable } from 'discord.js';
-import type { SlashItem } from '../bases/slash';
-import type Slash from '../bases/slash';
-import type Prefix from '../bases/prefix';
-import type { PrefixItem } from '../bases/prefix';
-import type Event from '../bases/event';
-import type { ComponentCategory } from '../bases/component';
-import type Component from '../bases/component';
+import type { SlashItem } from '../core/bases/slash';
+import type Slash from '../core/bases/slash';
+import type Prefix from '../core/bases/prefix';
+import type { PrefixItem } from '../core/bases/prefix';
+import type Event from '../core/bases/event';
+import type { ComponentCategory } from '../core/bases/component';
+import type Component from '../core/bases/component';
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 

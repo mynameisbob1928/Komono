@@ -1,11 +1,11 @@
-import Event from 'bases/event';
-import Slash from 'bases/slash';
+import Event from 'core/bases/event';
+import Slash from 'core/bases/slash';
 import Env from 'libs/env';
 import { Translate } from 'libs/locales';
 import type { SlashType, ComponentType } from 'types/types';
+import { TextDisplay } from 'utils/component';
 import { Container } from 'utils/container';
-import { Component } from 'utils/component';
-import { Cooldown } from 'utils/cooldown';
+import { CheckCooldown } from 'utils/cooldown';
 import { Log } from 'utils/log';
 import { Highlight, Codeblock, Link } from 'utils/markdown';
 import { CommandInteractionOptionResolver, InteractionType, MessageFlags } from 'discord.js';
@@ -24,7 +24,7 @@ export default new Event({
         ) as SlashType;
         if (!command) return;
 
-        Log.Write(`Received slash command interaction: ${(command.name as any).global ?? command.name}`, 'green');
+        Log(`Received slash command interaction: ${(command.name as any).global ?? command.name}`, 'green');
 
         const dev = Env.Required('dev');
 
@@ -56,7 +56,7 @@ export default new Event({
         }
 
         try {
-          Cooldown.Check(
+          CheckCooldown(
             interaction.client,
             interaction.user.id,
             typeof command.name === 'string' ? command.name : command.name.global,
@@ -81,17 +81,16 @@ export default new Event({
         try {
           await command.run(interaction, Slash.Resolve(interaction, command.args));
         } catch (e) {
-          Log.Write(e, 'red');
+          Log(e, 'red');
 
-          const text = Component.Create({
-            type: 'textDisplay',
+          const text = new TextDisplay({
             content: Translate(l, 'command:errorExecution', [
               Codeblock('ansi', (e as Error).message),
               Link('https://discord.gg/7b234YFhmn', Translate(l, 'command:supportLink')),
             ]),
           });
 
-          const container = Container.Create({ components: [text] });
+          const container = new Container({ components: [text] });
 
           if (command.defer) {
             await interaction.editReply({
@@ -116,12 +115,12 @@ export default new Event({
         ) as SlashType;
         if (!command || !command.autocomplete) return;
 
-        Log.Write(`Received autocomplete interaction: ${command.name}`, 'green');
+        Log(`Received autocomplete interaction: ${command.name}`, 'green');
 
         try {
           await command.autocomplete(interaction);
         } catch (e) {
-          Log.Write(e, 'red');
+          Log(e, 'red');
         }
         break;
       }
@@ -135,12 +134,12 @@ export default new Event({
           ) as ComponentType;
           if (!button) return;
 
-          Log.Write(`Received button interaction: ${interaction.customId}`, 'green');
+          Log(`Received button interaction: ${interaction.customId}`, 'green');
 
           try {
             await button.run(interaction, args);
           } catch (e) {
-            Log.Write(e, 'red');
+            Log(e, 'red');
           }
         } else if (interaction.isAnySelectMenu()) {
           const menu = interaction.client.components.find(
@@ -148,12 +147,12 @@ export default new Event({
           ) as ComponentType;
           if (!menu) return;
 
-          Log.Write(`Received select menu interaction: ${interaction.customId}`, 'green');
+          Log(`Received select menu interaction: ${interaction.customId}`, 'green');
 
           try {
             await menu.run(interaction, args);
           } catch (e) {
-            Log.Write(e, 'red');
+            Log(e, 'red');
           }
         }
         break;
@@ -167,12 +166,12 @@ export default new Event({
         ) as ComponentType;
         if (!modal) return;
 
-        Log.Write(`Received modal submit interaction: ${interaction.customId}`, 'green');
+        Log(`Received modal submit interaction: ${interaction.customId}`, 'green');
 
         try {
           await modal.run(interaction, args);
         } catch (e) {
-          Log.Write(e, 'red');
+          Log(e, 'red');
         }
         break;
       }

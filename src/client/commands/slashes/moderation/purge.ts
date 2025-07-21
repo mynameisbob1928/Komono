@@ -1,7 +1,7 @@
-import Slash from 'bases/slash';
+import Slash from 'core/bases/slash';
 import { MessageFlags } from 'discord.js';
 import { Translate } from 'libs/locales';
-import { Component } from 'utils/component';
+import { TextDisplay } from 'utils/component';
 import { Container } from 'utils/container';
 import { Highlight, Icon } from 'utils/markdown';
 
@@ -59,12 +59,9 @@ export default new Slash({
     const channel = interaction.channel;
 
     if (!channel?.isTextBased()) {
-      const text = Component.Create({
-        type: 'textDisplay',
-        content: `${Icon('Error')} ${Translate(l, 'purge:channelTypeError')}`,
-      });
+      const text = new TextDisplay({ content: `${Icon('Error')} ${Translate(l, 'purge:channelTypeError')}` });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await interaction.editReply({
         components: [container],
@@ -83,12 +80,9 @@ export default new Slash({
     }
 
     if (filtered.size === 0) {
-      const text = Component.Create({
-        type: 'textDisplay',
-        content: `${Icon('Info')} ${Translate(l, 'purge:noContentError')}`,
-      });
+      const text = new TextDisplay({ content: `${Icon('Info')} ${Translate(l, 'purge:noContentError')}` });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await interaction.editReply({
         components: [container],
@@ -99,12 +93,11 @@ export default new Slash({
 
     await channel.bulkDelete(filtered, true);
 
-    const text = Component.Create({
-      type: 'textDisplay',
+    const text = new TextDisplay({
       content: `${Icon('Success')} ${Translate(l, 'purge:bulkDeleteSuccess', [Highlight(filtered.size)])}`,
     });
 
-    const container = Container.Create({ components: [text] });
+    const container = new Container({ components: [text] });
 
     const int = await interaction.editReply({
       components: [container],

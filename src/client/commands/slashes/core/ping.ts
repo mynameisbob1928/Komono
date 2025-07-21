@@ -1,4 +1,4 @@
-import Slash from 'bases/slash';
+import Slash from 'core/bases/slash';
 import Prisma from 'libs/database';
 import { Routes } from 'discord.js';
 import { Translate } from 'libs/locales';

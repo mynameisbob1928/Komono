@@ -1,12 +1,12 @@
-import Prefix from 'bases/prefix';
+import Prefix from 'core/bases/prefix';
 import { MessageFlags } from 'discord.js';
-import { Component } from 'utils/component';
+import { TextDisplay } from 'utils/component';
 import { Container } from 'utils/container';
 import { Highlight, Icon } from 'utils/markdown';
 
 export default new Prefix({
   name: 'purge',
-  aliases: ['clean', 'wipe'],
+  aliases: ['clean'],
   description: 'Delete messages in the current channel',
   cooldown: 5,
   permissions: {
@@ -36,12 +36,9 @@ export default new Prefix({
     const channel = message.channel;
 
     if (!channel?.isTextBased()) {
-      const text = Component.Create({
-        type: 'textDisplay',
-        content: `${Icon('Error')} This command can only be used in text channels`,
-      });
+      const text = new TextDisplay({ content: `${Icon('Error')} This command can only be used in text channels` });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],
@@ -59,12 +56,9 @@ export default new Prefix({
     }
 
     if (filtered.size === 0) {
-      const text = Component.Create({
-        type: 'textDisplay',
-        content: `${Icon('Info')} No messages found with that content`,
-      });
+      const text = new TextDisplay({ content: `${Icon('Info')} No messages found with that content` });
 
-      const container = Container.Create({ components: [text] });
+      const container = new Container({ components: [text] });
 
       await message.reply({
         components: [container],
@@ -75,12 +69,11 @@ export default new Prefix({
 
     await channel.bulkDelete(filtered, true);
 
-    const text = Component.Create({
-      type: 'textDisplay',
+    const text = new TextDisplay({
       content: `${Icon('Success')} Successfully deleted ${Highlight(filtered.size)} messages`,
     });
 
-    const container = Container.Create({ components: [text] });
+    const container = new Container({ components: [text] });
 
     const msg = await message.reply({
       components: [container],

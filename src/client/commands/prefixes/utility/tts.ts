@@ -1,6 +1,14 @@
-import Prefix from 'bases/prefix';
-import { Component } from 'utils/component';
+import Prefix from 'core/bases/prefix';
 import { ButtonStyle, ChannelType, MessageFlags, SeparatorSpacingSize } from 'discord.js';
+import {
+  TextDisplay,
+  StringSelectMenu,
+  ChannelSelectMenu,
+  ActionRow,
+  Button,
+  Section,
+  Separator,
+} from 'utils/component';
 import { Container } from 'utils/container';
 
 export default new Prefix({
@@ -12,43 +20,30 @@ export default new Prefix({
   },
   dev: true,
   async run(client, message, args) {
-    const text1 = Component.Create({
-      type: 'textDisplay',
-      content: "## Set up Komono's TTS system",
-    });
+    const text1 = new TextDisplay({ content: "## Set up Komono's TTS system" });
 
-    const text2 = Component.Create({
-      type: 'textDisplay',
-      content: 'Choose a channel where Komono will read messages using TTS',
-    });
+    const text2 = new TextDisplay({ content: 'Choose a channel where Komono will read messages using TTS' });
 
-    const text3 = Component.Create({
-      type: 'textDisplay',
-      content: 'Select a voice for your TTS',
-    });
+    const text3 = new TextDisplay({ content: 'Select a voice for your TTS' });
 
-    const text4 = Component.Create({
-      type: 'textDisplay',
+    const text4 = new TextDisplay({
       content:
         'Auto-detect:\n- If enabled, Komono will read all messages, not just mentions\n-# Example: @komono Hello chat -> Hello chat',
     });
 
-    const text5 = Component.Create({
-      type: 'textDisplay',
+    const text5 = new TextDisplay({
       content: 'Reset server config:\n- Clicking delete will erase all TTS data for this server',
     });
 
-    const channelSelectMenu = Component.Create({
-      type: 'channelSelectMenu',
+    const channelSelectMenu = new ChannelSelectMenu({
       customId: 'channelTTS',
-      text: 'Select a channel',
-      channelType: [ChannelType.GuildText],
+      placeholder: 'Select a channel',
+      channelTypes: [ChannelType.GuildText],
     });
 
-    const stringSelectMenu = Component.Create({
-      type: 'stringSelectMenu',
+    const stringSelectMenu = new StringSelectMenu({
       customId: 'voiceTTS',
-      text: 'Select a voice',
+      placeholder: 'Select a voice',
       options: [
         { label: 'Male (en-US)', value: 's0XGIcqmceN2l7kjsqoZ' },
         { label: 'Female (en-US', value: 'fsl9wxwCbGk0XzqV61Fj' },
@@ -56,42 +51,37 @@ export default new Prefix({
       ],
     });
 
-    const action1 = Component.CreateActionRow([channelSelectMenu]);
-    const action2 = Component.CreateActionRow([stringSelectMenu]);
+    const action1 = new ActionRow(channelSelectMenu);
+    const action2 = new ActionRow(stringSelectMenu);
 
-    const button1 = Component.Create({
-      type: 'button',
+    const button1 = new Button({
       customId: 'autoDetectTTS',
       text: 'Enable',
       color: ButtonStyle.Primary,
     });
 
-    const button2 = Component.Create({
-      type: 'button',
-      customId: 'dataWipeTTS',
+    const button2 = new Button({
+      customId: 'dataResetTTS',
       text: 'Reset',
       color: ButtonStyle.Danger,
     });
 
-    const sect1 = Component.Create({
-      type: 'section',
+    const sect1 = new Section({
       components: [text4],
       accessory: button1,
     });
 
-    const sect2 = Component.Create({
-      type: 'section',
+    const sect2 = new Section({
       components: [text5],
       accessory: button2,
     });
 
-    const sep = Component.Create({
-      type: 'separator',
+    const sep = new Separator({
       spacing: SeparatorSpacingSize.Large,
       divider: true,
     });
 
-    const container = Container.Create({
+    const container = new Container({
       components: [text1, sep, text2, action1, sep, text3, action2, sep, sect1, sep, sect2],
     });
 

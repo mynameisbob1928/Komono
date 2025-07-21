@@ -3,7 +3,9 @@ import Env from 'libs/env';
 import path from 'path';
 import { ShardingClient } from 'status-sharding';
 import type { EventType, SlashType, PrefixType } from 'types/types';
-import { Handler } from 'utils/handler';
+import { Initialize, Reload } from 'handlers/loader';
+import { Bind } from 'handlers/listener';
+import { Register } from 'handlers/register';
 import { Log } from 'utils/log';
 import { Debounce, TimeFormat } from 'utils/utils';
 import FolderWatcher from 'utils/watcher';
@@ -74,25 +76,25 @@ const token = Env.Required('token');
 const now = Date.now();
 
 process.on('uncaughtException', (error) => {
-  Log.Write(`Uncaught Exception: ${error}`, 'red');
+  Log(`Uncaught Exception: ${error}`, 'red');
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  Log.Write(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, 'red');
+  Log(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, 'red');
 });
 
 process.on('warning', (warning) => {
-  Log.Write(`WARNING: ${warning.name} : ${warning.message}`, 'yellow');
+  Log(`WARNING: ${warning.name} : ${warning.message}`, 'yellow');
 });
 
 process.on('SIGINT', async () => {
-  Log.Write('Shutting down Komono...', 'cyan');
+  Log('Shutting down Komono...', 'cyan');
   await client.destroy();
 
   process.exit(0);
 });
 
-await Handler.Initialize(client, {
+await Initialize(client, {
   events: `${__dirname}/events`,
   slashes: `${__dirname}/commands/slashes`,
   prefixes: `${__dirname}/commands/prefixes`,
@@ -102,7 +104,7 @@ await Handler.Initialize(client, {
 const watcher = new FolderWatcher(path.join('src', 'client'), true);
 
 async function HotReload(filepath: string) {
-  Log.Write(`Hot reload triggered for ${path.normalize(filepath)}`, 'yellow');
+  Log(`Hot reload triggered for ${path.normalize(filepath)}`, 'yellow');
   let cache, dir;
 
   const normalized = path.normalize(filepath);
@@ -131,23 +133,23 @@ async function HotReload(filepath: string) {
   }
 
   if (!cache || !dir) {
-    Log.Write('Hot reload ignored', 'red');
+    Log('Hot reload ignored', 'red');
     return;
   }
 
-  Log.Write(`Reloading ${dir}`, 'yellow');
-  await Handler.Reload(client, dir, cache);
+  Log(`Reloading ${dir}`, 'yellow');
+  await Reload(client, dir, cache);
 }
 
 watcher.onAdd = Debounce(HotReload, 5000);
 watcher.onChange = Debounce(HotReload, 5000);
 watcher.onRemove = Debounce(HotReload, 5000);
 
-Handler.Events.Bind(client);
-await Handler.Slashes.Register(client);
+Bind(client);
+await Register(client);
 
 client.once('ready', (client) => {
-  Log.Write(`${client.user!.username} is ready! Application startup took: ${TimeFormat(Date.now() - now)}.`, 'cyan');
+  Log(`${client.user!.username} is ready! Application startup took: ${TimeFormat(Date.now() - now)}.`, 'cyan');
 });
 
 await client.login(token);
