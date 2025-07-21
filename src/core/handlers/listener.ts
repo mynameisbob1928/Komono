@@ -1,5 +1,5 @@
 import type { Client } from 'discord.js';
-import type { EventType } from '../../types/types';
+import type { EventType } from 'types/types';
 
 export function Bind(client: Client) {
   Unbind(client);

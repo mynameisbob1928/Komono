@@ -28,7 +28,7 @@ export async function Reference(message: Message) {
   }).toString();
 
   return (await message.channel.messages.fetch({ after })).reduce((list, current) => {
-    if (current.reference && current.reference.messageId === last.id && current.author.id === message.author.id) {
+    if (current.reference && current.reference.messageId === last.id && current.author.id === message.client.user.id) {
       last = current;
       list.push(current);
     }
