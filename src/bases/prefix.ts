@@ -80,6 +80,7 @@ export interface PrefixProps<T extends Record<string, PrefixItem>> {
   permissions: CommandPermission;
   nsfw: boolean;
   dev: boolean;
+  cache: boolean;
   args: T;
   run(client: Client, message: Message, args: { [K in keyof T]: PrefixResolvedItem<T[K]> }): any;
 }
@@ -90,9 +91,10 @@ export default class Prefix<T extends Record<string, PrefixItem>> {
   public description;
   public cooldown;
   public permissions;
+  public args;
   public nsfw;
   public dev;
-  public args;
+  public cache;
   public run;
 
   public static async Parse<T extends Record<string, PrefixItem>>(client: Client, message: Message, args: T) {
@@ -267,7 +269,9 @@ export default class Prefix<T extends Record<string, PrefixItem>> {
     return solved;
   }
 
-  constructor(props: Optional<PrefixProps<T>, 'aliases' | 'cooldown' | 'permissions' | 'args' | 'nsfw' | 'dev'>) {
+  constructor(
+    props: Optional<PrefixProps<T>, 'aliases' | 'cooldown' | 'permissions' | 'args' | 'nsfw' | 'dev' | 'cache'>,
+  ) {
     props.permissions = props.permissions || { client: [], author: [] };
 
     this.name = props.name;
@@ -278,6 +282,7 @@ export default class Prefix<T extends Record<string, PrefixItem>> {
     this.args = props.args || {};
     this.nsfw = !!props.nsfw;
     this.dev = !!props.dev;
+    this.cache = !!props.cache;
     this.run = props.run;
   }
 }

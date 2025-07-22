@@ -6,6 +6,7 @@ export default new Prefix({
   name: 'ping',
   description: 'Check if the bot is alive',
   cooldown: 3,
+  // cache: true,
   async run(client, message, args) {
     // REST
     const restStart = performance.now();
@@ -14,7 +15,7 @@ export default new Prefix({
 
     // Database
     const databaseStart = performance.now();
-    await Prisma.dummy.count();
+    await Prisma.dummy.count({ cacheStrategy: { ttl: 120, swr: 60 } });
     const databaseLatency = Math.round(performance.now() - databaseStart);
 
     // WS

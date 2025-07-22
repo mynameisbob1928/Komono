@@ -116,6 +116,7 @@ export interface SlashProps<T extends Record<string, SlashItem>> {
   dev: boolean;
   defer: boolean;
   ephemeral: boolean;
+  cache: boolean;
   run(interaction: ChatInputCommandInteraction, args: { [K in keyof T]: SlashResolvedItem<T[K]> }): any;
   autocomplete(interaction: AutocompleteInteraction): any;
 }
@@ -132,13 +133,14 @@ export default class Slash<T extends Record<string, SlashItem>> {
   public dev;
   public defer;
   public ephemeral;
+  public cache;
   public run;
   public autocomplete;
 
   public static Build<T extends Record<string, SlashItem>>(
     props: Optional<
       SlashProps<T>,
-      'cooldown' | 'permissions' | 'args' | 'nsfw' | 'dev' | 'defer' | 'ephemeral' | 'autocomplete'
+      'cooldown' | 'permissions' | 'args' | 'nsfw' | 'dev' | 'defer' | 'ephemeral' | 'cache' | 'autocomplete'
     >,
   ) {
     const base = new SlashCommandBuilder()
@@ -343,7 +345,7 @@ export default class Slash<T extends Record<string, SlashItem>> {
   constructor(
     props: Optional<
       SlashProps<T>,
-      'cooldown' | 'permissions' | 'args' | 'nsfw' | 'dev' | 'defer' | 'ephemeral' | 'autocomplete'
+      'cooldown' | 'permissions' | 'args' | 'nsfw' | 'dev' | 'defer' | 'ephemeral' | 'cache' | 'autocomplete'
     >,
   ) {
     props.permissions = props.permissions || { client: [], author: [] };
@@ -359,6 +361,7 @@ export default class Slash<T extends Record<string, SlashItem>> {
     this.dev = !!props.dev;
     this.defer = !(props.defer == undefined ? true : !props.defer);
     this.ephemeral = !!props.ephemeral;
+    this.cache = !!props.cache;
     this.run = props.run;
     this.autocomplete = props.autocomplete;
   }

@@ -9,6 +9,8 @@ import { CheckCooldown } from 'utils/cooldown';
 import { Log } from 'utils/log';
 import { Highlight, Codeblock, Link } from 'utils/markdown';
 import { CommandInteractionOptionResolver, InteractionType, MessageFlags } from 'discord.js';
+import crypto from 'crypto';
+import Redis from 'libs/cache';
 
 export default new Event({
   name: 'interactions',
@@ -78,32 +80,110 @@ export default new Event({
           await interaction.deferReply(command.ephemeral || incognito ? { flags: MessageFlags.Ephemeral } : {});
         }
 
-        try {
-          await command.run(interaction, Slash.Resolve(interaction, command.args));
-        } catch (e) {
-          Log(e, 'red');
+        if (command.cache) {
+          Log(`Cache is enabled for: ${command.name}`, 'green');
 
-          const text = new TextDisplay({
-            content: Translate(l, 'command:errorExecution', [
-              Codeblock('ansi', (e as Error).message),
-              Link('https://discord.gg/7b234YFhmn', Translate(l, 'command:supportLink')),
-            ]),
-          });
+          const value = command.name + JSON.stringify(interaction.options.data);
+          const key = crypto.createHash('sha1').update(value).digest('hex');
+          const cached = await Redis.get(key);
 
-          const container = new Container({ components: [text] });
+          if (cached) {
+            try {
+              const parsed = JSON.parse(cached);
+
+              if (command.defer) {
+                await interaction.editReply(parsed);
+              } else {
+                await interaction.reply(parsed);
+              }
+              return;
+            } catch (e) {
+              Log(`Error parsing cached data: ${e}`, 'red');
+            }
+          }
+
+          let reply = command.defer ? interaction.editReply.bind(interaction) : interaction.reply.bind(interaction);
+          let response;
 
           if (command.defer) {
-            await interaction.editReply({
-              components: [container],
-              flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
-            });
+            interaction.editReply = function (...args) {
+              response = args[0];
+              // @ts-ignore
+              return reply(...args) as any;
+            };
           } else {
-            await interaction.reply({
-              components: [container],
-              flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
-            });
+            interaction.reply = function (...args) {
+              response = args[0];
+              // @ts-ignore
+              return reply(...args) as any;
+            };
           }
-          return;
+
+          try {
+            await command.run(interaction, Slash.Resolve(interaction, command.args));
+          } catch (e) {
+            Log(`Command ${command.name} has errored`, 'red');
+            Log(e, 'red');
+
+            const text = new TextDisplay({
+              content: Translate(l, 'command:errorExecution', [
+                Codeblock('ansi', (e as Error).message),
+                Link('https://discord.gg/7b234YFhmn', Translate(l, 'command:supportLink')),
+              ]),
+            });
+
+            const container = new Container({ components: [text] });
+
+            if (command.defer) {
+              await interaction.editReply({
+                components: [container],
+                flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+              });
+            } else {
+              await interaction.reply({
+                components: [container],
+                flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+              });
+            }
+            return;
+          }
+
+          try {
+            await Redis.setex(key, 120, JSON.stringify(response));
+          } catch (e) {
+            Log('Error saving cache', 'red');
+            Log(e, 'red');
+            return;
+          }
+        } else {
+          try {
+            await command.run(interaction, Slash.Resolve(interaction, command.args));
+          } catch (e) {
+            Log(`Command ${command.name} has errored`, 'red');
+            Log(e, 'red');
+
+            const text = new TextDisplay({
+              content: Translate(l, 'command:errorExecution', [
+                Codeblock('ansi', (e as Error).message),
+                Link('https://discord.gg/7b234YFhmn', Translate(l, 'command:supportLink')),
+              ]),
+            });
+
+            const container = new Container({ components: [text] });
+
+            if (command.defer) {
+              await interaction.editReply({
+                components: [container],
+                flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+              });
+            } else {
+              await interaction.reply({
+                components: [container],
+                flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+              });
+            }
+            return;
+          }
         }
         break;
       }

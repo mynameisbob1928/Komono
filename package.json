@@ -21,7 +21,9 @@
     "@elevenlabs/elevenlabs-js": "^2.6.0",
     "@prisma/client": "^6.11.1",
     "@prisma/extension-accelerate": "^2.0.1",
+    "crypto": "^1.0.1",
     "discord.js": "^14.21.0",
+    "ioredis": "^5.6.1",
     "prisma": "^6.11.1",
     "status-sharding": "^1.8.15",
     "together-ai": "^0.19.0"

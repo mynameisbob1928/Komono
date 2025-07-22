@@ -77,15 +77,20 @@ const token = Env.Required('token');
 const now = Date.now();
 
 process.on('uncaughtException', (error) => {
-  Log(`Uncaught Exception: ${error}`, 'red');
+  Log('Uncaught Exception', 'red');
+  Log(error, 'red');
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  Log(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, 'red');
+  Log('Unhandled Rejection', 'red');
+  Log(promise, 'red');
+  Log('With the reason', 'red');
+  Log(reason, 'red');
 });
 
 process.on('warning', (warning) => {
-  Log(`WARNING: ${warning.name} : ${warning.message}`, 'yellow');
+  Log('WARNING', 'yellow');
+  Log(warning, 'yellow');
 });
 
 process.on('SIGINT', async () => {

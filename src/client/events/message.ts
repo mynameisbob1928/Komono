@@ -8,6 +8,8 @@ import { CheckCooldown } from 'utils/cooldown';
 import { Log } from 'utils/log';
 import { Highlight, Icon, Codeblock, Link } from 'utils/markdown';
 import { ChannelType, MessageFlags } from 'discord.js';
+import crypto from 'crypto';
+import Redis from 'libs/cache';
 
 export default new Event({
   name: 'message',
@@ -89,21 +91,78 @@ export default new Event({
       return;
     }
 
-    try {
-      await command.run(message.client, message, args);
-    } catch (e) {
-      Log(e, 'red');
-      const text = new TextDisplay({
-        content: `Something went wrong while attempting to run this command.\n${Codeblock('ansi', (e as Error).message)}\n-# Contact support ${Link('https://discord.gg/7b234YFhmn', 'here')}`,
-      });
+    if (command.cache) {
+      Log(`Cache is enabled for: ${command.name}`, 'green');
 
-      const container = new Container({ components: [text] });
+      const value = command.name + JSON.stringify(args);
+      const key = crypto.createHash('sha1').update(value).digest('hex');
+      const cached = await Redis.get(key);
 
-      await message.reply({
-        components: [container],
-        flags: MessageFlags.IsComponentsV2,
-      });
-      return;
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+
+          await message.reply(parsed);
+          return;
+        } catch (e) {
+          Log(`Error parsing cached data`, 'red');
+          Log(e, 'red');
+        }
+      }
+
+      const reply = message.reply.bind(message);
+      let response;
+
+      message.reply = function (...args) {
+        response = args[0];
+        return reply(...args);
+      };
+
+      try {
+        await command.run(message.client, message, args);
+      } catch (e) {
+        Log(`Command ${command.name} has errored`, 'red');
+        Log(e, 'red');
+
+        const text = new TextDisplay({
+          content: `Something went wrong while attempting to run this command.\n${Codeblock('ansi', (e as Error).message)}\n-# Contact support ${Link('https://discord.gg/7b234YFhmn', 'here')}`,
+        });
+
+        const container = new Container({ components: [text] });
+
+        await message.reply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+        });
+        return;
+      }
+
+      try {
+        await Redis.setex(key, 120, JSON.stringify(response));
+      } catch (e) {
+        Log('Error saving cache', 'red');
+        Log(e, 'red');
+        return;
+      }
+    } else {
+      try {
+        await command.run(message.client, message, args);
+      } catch (e) {
+        Log(`Command ${command.name} has errored`, 'red');
+        Log(e, 'red');
+
+        const text = new TextDisplay({
+          content: `Something went wrong while attempting to run this command.\n${Codeblock('ansi', (e as Error).message)}\n-# Contact support ${Link('https://discord.gg/7b234YFhmn', 'here')}`,
+        });
+
+        const container = new Container({ components: [text] });
+
+        await message.reply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+        });
+        return;
+      }
     }
   },
 });

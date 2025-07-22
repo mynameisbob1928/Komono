@@ -12,6 +12,38 @@ export default new (class Env {
     return `${content}`;
   }
 
+  public ToNumber(content: any) {
+    if (isNaN(content)) {
+      throw new Error(`item "${content}" is not a valid number`);
+    }
+
+    return Number(content);
+  }
+
+  public ToInt(content: any) {
+    return Math.floor(this.ToNumber(content));
+  }
+
+  public ToBoolean(content: any) {
+    return content == 'true' || content == 'True';
+  }
+
+  public ToArray(content: any) {
+    if (content[0] !== '[' && content[content.length - 1] !== ']') {
+      throw new Error(`item "${content}" is not a valid array`);
+    }
+
+    return JSON.parse(content);
+  }
+
+  public ToObject(content: any) {
+    if (content[0] !== '{' && content[content.length - 1] !== '}') {
+      throw new Error(`item "${content}" is not a valid object`);
+    }
+
+    return JSON.parse(content);
+  }
+
   public Has(key: string) {
     return this.#_values.has(key);
   }

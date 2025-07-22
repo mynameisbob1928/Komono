@@ -12,7 +12,7 @@ export default new Slash({
   cooldown: 3,
   integrations: ['guild', 'user'],
   contexts: ['guild', 'bot', 'DM'],
-  defer: false,
+  defer: true,
   async run(interaction, args) {
     const l = interaction.locale;
 
@@ -23,12 +23,14 @@ export default new Slash({
 
     // Database
     const databaseStart = performance.now();
-    await Prisma.dummy.count();
+    await Prisma.dummy.count({ cacheStrategy: { ttl: 120, swr: 60 } });
     const databaseLatency = Math.round(performance.now() - databaseStart);
 
     // WS
     const wsLatency = interaction.client.ws.ping;
 
-    await interaction.editReply(Translate(l, 'ping:response', [restLatency, databaseLatency, wsLatency]));
+    await interaction.editReply(
+      Translate(l, 'ping:response', [interaction.guild?.shardId ?? 'N/A', wsLatency, restLatency, databaseLatency]),
+    );
   },
 });
