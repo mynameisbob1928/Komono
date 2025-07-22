@@ -10,7 +10,7 @@ import { Translate } from 'libs/locales';
 export default new Slash({
   name: {
     global: 'stats',
-    'pt-BR': 'Estatísticas',
+    'pt-BR': 'estatísticas',
   },
   description: {
     global: 'View some stats',
@@ -20,7 +20,6 @@ export default new Slash({
   contexts: ['guild', 'DM', 'bot'],
   cooldown: 3,
   defer: true,
-  cache: true,
   async run(interaction, args) {
     const l = interaction.locale;
 

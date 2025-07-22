@@ -17,6 +17,7 @@ export default new Prefix({
       foo: 'bar',
     },
   },
+  cache: true,
   async run(client, message, args) {
     if (!message.inGuild()) return;
 

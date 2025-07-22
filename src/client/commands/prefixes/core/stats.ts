@@ -11,7 +11,6 @@ export default new Prefix({
   aliases: ['debug', 'usage', 'status'],
   description: 'View some stats',
   cooldown: 3,
-  cache: true,
   async run(client, message, args) {
     if (!message.inGuild()) return;
 
