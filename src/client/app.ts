@@ -7,7 +7,7 @@ import { Initialize, Reload } from 'libs/loader';
 import { Bind } from 'libs/listener';
 import { Register } from 'libs/register';
 import { Log } from 'utils/log';
-import { Debounce, TimeFormat } from 'utils/utils';
+import { Debounce, FormatTime } from 'utils/utils';
 import FolderWatcher from 'utils/watcher';
 import Prisma from 'libs/database';
 
@@ -161,7 +161,7 @@ Bind(client);
 await Register(client);
 
 client.once('ready', (client) => {
-  Log(`${client.user!.username} is ready! Application startup took: ${TimeFormat(Date.now() - now)}.`, 'cyan');
+  Log(`${client.user!.username} is ready! Application startup took: ${FormatTime(Date.now() - now)}.`, 'cyan');
 });
 
 await client.login(token);

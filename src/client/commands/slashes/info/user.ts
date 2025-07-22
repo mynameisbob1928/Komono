@@ -32,7 +32,6 @@ export default new Slash({
     },
   },
   defer: true,
-  cache: true,
   async run(interaction, args) {
     const l = interaction.locale;
 

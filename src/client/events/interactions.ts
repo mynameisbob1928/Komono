@@ -149,7 +149,7 @@ export default new Event({
           }
 
           try {
-            await Redis.setex(key, 120, JSON.stringify(response));
+            await Redis.setex(key, 60, JSON.stringify(response));
           } catch (e) {
             Log('Error saving cache', 'red');
             Log(e, 'red');

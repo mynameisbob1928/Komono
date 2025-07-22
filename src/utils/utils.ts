@@ -2,7 +2,27 @@ import { SnowflakeUtil, type Message } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 
-export function TimeFormat(duration: number | string) {
+export const ReadableFileSizeUnits = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+export function ReadableFileSize(bytes: number, micro = false, precision = 1): string {
+  const thresh = micro ? 1000 : 1024;
+
+  if (Math.abs(bytes) < thresh) {
+    return `${bytes} B`;
+  }
+
+  let unit = -1;
+  const round = 10 ** precision;
+
+  do {
+    bytes /= thresh;
+    ++unit;
+  } while (Math.round(Math.abs(bytes) * round) / round >= thresh && unit < ReadableFileSizeUnits.length - 1);
+
+  return `${bytes.toFixed(precision)} ${ReadableFileSizeUnits[unit]}`;
+}
+
+export function FormatTime(duration: number | string) {
   const total = Math.floor(Number(duration) / 1000);
   const days = Math.floor(total / (24 * 60 * 60));
   const hours = Math.floor((total % (24 * 60 * 60)) / (60 * 60));
@@ -16,7 +36,7 @@ export function TimeFormat(duration: number | string) {
   if (hours > 0) parts.push(`${hours}h`);
   if (minutes > 0) parts.push(`${minutes}m`);
   if (seconds > 0) parts.push(`${seconds}s`);
-  if (milliseconds > 0 || (parts.length === 0 && Number(duration) < 1000)) parts.push(`${milliseconds}ms`);
+  if (milliseconds > 0) parts.push(`${milliseconds}ms`);
 
   return parts.join(' ');
 }
