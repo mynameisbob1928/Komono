@@ -22,15 +22,16 @@ const manager = new ClusterManager(client, {
 });
 
 process.on('uncaughtException', (error) => {
-  Log(`Uncaught Exception: ${error}`, 'red');
+  Log(error, 'red');
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  Log(`Unhandled Rejection at: ${promise} with the reason: ${reason}`, 'red');
+  Log(reason, 'red');
+  Log(promise, 'red');
 });
 
 process.on('warning', (warning) => {
-  Log(`WARNING: ${warning.name} : ${warning.message}`, 'red');
+  Log(warning, 'red');
 });
 
 manager.on('clusterCreate', (cluster) => {

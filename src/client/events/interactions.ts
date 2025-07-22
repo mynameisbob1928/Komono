@@ -1,5 +1,5 @@
-import Event from 'core/bases/event';
-import Slash from 'core/bases/slash';
+import Event from 'bases/event';
+import Slash from 'bases/slash';
 import Env from 'libs/env';
 import { Translate } from 'libs/locales';
 import type { SlashType, ComponentType } from 'types/types';

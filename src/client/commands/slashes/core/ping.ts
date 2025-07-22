@@ -1,4 +1,4 @@
-import Slash from 'core/bases/slash';
+import Slash from 'bases/slash';
 import Prisma from 'libs/database';
 import { Routes } from 'discord.js';
 import { Translate } from 'libs/locales';
@@ -12,7 +12,7 @@ export default new Slash({
   cooldown: 3,
   integrations: ['guild', 'user'],
   contexts: ['guild', 'bot', 'DM'],
-  defer: true,
+  defer: false,
   async run(interaction, args) {
     const l = interaction.locale;
 

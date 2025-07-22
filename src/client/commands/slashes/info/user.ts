@@ -1,4 +1,4 @@
-import Slash from 'core/bases/slash';
+import Slash from 'bases/slash';
 import { MessageFlags, SeparatorSpacingSize } from 'discord.js';
 import Env from 'libs/env';
 import { Translate } from 'libs/locales';

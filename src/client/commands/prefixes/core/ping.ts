@@ -1,4 +1,4 @@
-import Prefix from 'core/bases/prefix';
+import Prefix from 'bases/prefix';
 import Prisma from 'libs/database';
 import { Routes } from 'discord.js';
 

@@ -50,8 +50,8 @@ export default class FolderWatcher {
       if (stats.isDirectory()) return ItemType.DIRECTORY;
       if (stats.isSymbolicLink()) return ItemType.SYMLINK;
     } catch (err) {
-      Log.Write(`Error getting item type for file: ${file}`, 'red');
-      Log.Write(err, 'red');
+      Log(`Error getting item type for file: ${file}`, 'red');
+      Log(err, 'red');
     }
 
     return ItemType.UNKNOWN;
@@ -82,7 +82,7 @@ export default class FolderWatcher {
 
   public WatcherEvent(path: string, event: 'change' | 'rename', filename: string | null) {
     if (!filename) {
-      Log.Write(`Filename is null for path: ${path}`, 'yellow');
+      Log(`Filename is null for path: ${path}`, 'yellow');
       return;
     }
 

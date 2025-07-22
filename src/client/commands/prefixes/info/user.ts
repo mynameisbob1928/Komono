@@ -1,4 +1,4 @@
-import Prefix from 'core/bases/prefix';
+import Prefix from 'bases/prefix';
 import { MessageFlags, SeparatorSpacingSize } from 'discord.js';
 import Env from 'libs/env';
 import { Section, Separator, TextDisplay, Thumbnail } from 'utils/component';

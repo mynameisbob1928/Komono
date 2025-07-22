@@ -1,7 +1,7 @@
 import { REST, Routes, type Client } from 'discord.js';
 import Env from 'libs/env';
 import type { SlashType } from 'types/types';
-import Slash from 'core/bases/slash';
+import Slash from 'bases/slash';
 
 export const Rest = new REST().setToken(Env.Required('token'));
 

@@ -1,3 +1,4 @@
+import { TextInputBuilder } from '@discordjs/builders';
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -18,6 +19,9 @@ import {
   type PartialEmoji,
   type APIMediaGalleryItem,
   SeparatorSpacingSize,
+  ModalBuilder,
+  TextInputStyle,
+  ComponentType,
 } from 'discord.js';
 
 export interface ButtonProps {
@@ -151,6 +155,49 @@ export class ChannelSelectMenu extends ChannelSelectMenuBuilder {
   }
 }
 
+export interface ModalProps {
+  customId: string;
+  title: string;
+  components?: ActionRowBuilder<any>[];
+}
+
+export class Modal extends ModalBuilder {
+  constructor(props: ModalProps) {
+    super({
+      customId: props.customId,
+      title: props.title,
+      components: props.components,
+    });
+  }
+}
+
+export interface TextInputProps {
+  customId: string;
+  text: string;
+  format: TextInputStyle;
+  placeholder?: string;
+  max?: number;
+  min?: number;
+  default?: any;
+  required?: boolean;
+}
+
+export class TextInput extends TextInputBuilder {
+  constructor(props: TextInputProps) {
+    super({
+      type: ComponentType.TextInput,
+      custom_id: props.customId,
+      label: props.text,
+      style: props.format,
+      placeholder: props.placeholder,
+      max_length: props.max,
+      min_length: props.min,
+      value: props.default,
+      required: props.required,
+    });
+  }
+}
+
 export interface FileProps {
   url: string;
 }
@@ -232,7 +279,8 @@ export type ActionRowMessageComponents =
   | UserSelectMenu
   | RoleSelectMenu
   | MentionableSelectMenu
-  | ChannelSelectMenu;
+  | ChannelSelectMenu
+  | TextInput;
 
 export class ActionRow extends ActionRowBuilder<ActionRowMessageComponents> {
   constructor(...components: ActionRowMessageComponents[]) {

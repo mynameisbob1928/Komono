@@ -1,4 +1,4 @@
-import Prefix from 'core/bases/prefix';
+import Prefix from 'bases/prefix';
 import { MessageFlags } from 'discord.js';
 import { TextDisplay } from 'utils/component';
 import { Container } from 'utils/container';

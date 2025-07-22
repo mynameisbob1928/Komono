@@ -1,20 +1,20 @@
 import type { AnySelectMenuInteraction, ButtonInteraction, ModalSubmitInteraction } from 'discord.js';
 
-export type ComponentCategory = 'button' | 'selectMenu' | 'modal';
+export type ComponentType = 'button' | 'selectMenu' | 'modal';
 
-export type ComponentInteraction<T extends ComponentCategory> = T extends 'button'
+export type ComponentInteraction<T extends ComponentType> = T extends 'button'
   ? ButtonInteraction
   : T extends 'selectMenu'
     ? AnySelectMenuInteraction
     : ModalSubmitInteraction;
 
-export interface ComponentProps<T extends ComponentCategory> {
+export interface ComponentProps<T extends ComponentType> {
   id: string;
   type: T;
   run(interaction: ComponentInteraction<T>, args?: any[]): any;
 }
 
-export default class Component<T extends ComponentCategory> {
+export default class Component<T extends ComponentType> {
   public id;
   public type;
   public run;

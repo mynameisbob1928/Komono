@@ -1,5 +1,5 @@
-import Event from 'core/bases/event';
-import Prefix from 'core/bases/prefix';
+import Event from 'bases/event';
+import Prefix from 'bases/prefix';
 import Env from 'libs/env';
 import type { PrefixType } from 'types/types';
 import { TextDisplay } from 'utils/component';

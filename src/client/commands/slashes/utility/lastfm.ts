@@ -1,4 +1,4 @@
-import Slash from 'core/bases/slash';
+import Slash from 'bases/slash';
 import Env from 'libs/env';
 import Prisma from 'libs/database';
 import { AttachmentBuilder, MessageFlags } from 'discord.js';

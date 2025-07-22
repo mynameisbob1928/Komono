@@ -1,4 +1,4 @@
-import Slash from 'core/bases/slash';
+import Slash from 'bases/slash';
 import { MessageFlags } from 'discord.js';
 import { Translate } from 'libs/locales';
 import { TextDisplay } from 'utils/component';

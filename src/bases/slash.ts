@@ -343,7 +343,7 @@ export default class Slash<T extends Record<string, SlashItem>> {
   constructor(
     props: Optional<
       SlashProps<T>,
-      'cooldown' | 'permissions' | 'defer' | 'ephemeral' | 'nsfw' | 'dev' | 'autocomplete'
+      'cooldown' | 'permissions' | 'args' | 'nsfw' | 'dev' | 'defer' | 'ephemeral' | 'autocomplete'
     >,
   ) {
     props.permissions = props.permissions || { client: [], author: [] };
