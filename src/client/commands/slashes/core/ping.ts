@@ -1,5 +1,6 @@
 import Slash from 'bases/slash';
 import Prisma from 'libs/database';
+import Redis from 'libs/cache';
 import { Routes } from 'discord.js';
 import { Translate } from 'libs/locales';
 
@@ -26,11 +27,22 @@ export default new Slash({
     await Prisma.dummy.count({ cacheStrategy: { ttl: 120, swr: 60 } });
     const databaseLatency = Math.round(performance.now() - databaseStart);
 
+    // Cache
+    const cacheStart = performance.now();
+    await Redis.ping();
+    const cacheLatency = Math.round(performance.now() - cacheStart);
+
     // WS
     const wsLatency = interaction.client.ws.ping;
 
     await interaction.editReply(
-      Translate(l, 'ping:response', [interaction.guild?.shardId ?? 'N/A', wsLatency, restLatency, databaseLatency]),
+      Translate(l, 'ping:response', [
+        interaction.guild?.shardId ?? 'N/A',
+        wsLatency,
+        restLatency,
+        databaseLatency,
+        cacheLatency,
+      ]),
     );
   },
 });

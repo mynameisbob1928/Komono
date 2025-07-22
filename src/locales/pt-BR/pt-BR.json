@@ -3,7 +3,7 @@
   "command:clientMissingPerms": "Eu não possuo as seguintes permissões: {{0}}",
   "command:errorExecution": "Algo deu errado ao tentar executar este comando.\n{{0}}\n-# Entre em contato com o suporte {{1}}",
   "command:supportLink": "clicando aqui",
-  "ping:response": "Pong!\n-# Gateway (Shard {{0}}): **{{1}}** ・ REST: **{{2}}** ・ Banco de Dados: **{{3}}**",
+  "ping:response": "Pong!\n-# Gateway (Shard {{0}}): **{{1}}** ・ REST: **{{2}}** ・ Banco de Dados: **{{3}}** ・ Cache: **{{4}}**",
   "user:display": "Exibição",
   "user:created": "Criado",
   "user:joined": "Entrou",

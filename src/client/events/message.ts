@@ -25,6 +25,8 @@ export default new Event({
       return;
 
     const prefix = message.client.prefix;
+    if (!message.content.startsWith(prefix)) return;
+
     const dev = Env.Required('dev');
 
     const name = message.content.slice(prefix.length).trim().split(/\s+/).shift()?.toLowerCase();
